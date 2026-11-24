@@ -1,0 +1,2742 @@
+<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>LeamosTxTs</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,600;1,7..72,500&display=swap">
+<style>
+/* Layout: una estantería de portadas (biblioteca) y una sola columna de lectura con una barra de audio fija abajo. */
+:root{--trash-ic:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3'/%3E%3C/svg%3E");
+  --bg:#F4F6F8; --surface:#FFFFFF; --ink:#161E29; --muted:#5F6B7E; --line:#DFE4EA;
+  --accent:#0A7A76; --accent-ink:#FFFFFF; --accent-soft:#DCF1EF;
+  --hl:#FFE49A; --hl-soft:#FFF2CC; --danger:#B3261E;
+  --shadow:0 1px 2px rgba(16,24,40,.06),0 6px 20px rgba(16,24,40,.09);
+  --f-ui:"Inter",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --f-read:"Literata",Georgia,"Times New Roman",serif;
+  --fs:19px; --dock-h:0px;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#11151B; --surface:#192029; --ink:#E7EBF1; --muted:#9AA5B6; --line:#28313C;
+    --accent:#4CCFC9; --accent-ink:#05201F; --accent-soft:#153B3B;
+    --hl:#5E4D14; --hl-soft:#3B3418; --danger:#FF8A80; --shadow:0 1px 2px rgba(0,0,0,.4),0 6px 20px rgba(0,0,0,.4);
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#11151B; --surface:#192029; --ink:#E7EBF1; --muted:#9AA5B6; --line:#28313C;
+  --accent:#4CCFC9; --accent-ink:#05201F; --accent-soft:#153B3B;
+  --hl:#5E4D14; --hl-soft:#3B3418; --danger:#FF8A80; --shadow:0 1px 2px rgba(0,0,0,.4),0 6px 20px rgba(0,0,0,.4);
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html{-webkit-text-size-adjust:100%}
+body{background:var(--bg);color:var(--ink);font:15px/1.5 var(--f-ui);min-height:100vh}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:30;background:var(--bg)}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.ic{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.ic.f{fill:currentColor;stroke:none}
+.gx{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+
+/* Encabezado */
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--bg);border-bottom:1px solid var(--line)}
+.top-in{display:flex;align-items:center;gap:8px;height:56px;max-width:1040px;margin:0 auto}
+.brand{display:flex;align-items:center;gap:9px;font:600 20px/1 var(--f-read);letter-spacing:-.01em;margin-right:auto}
+.brand .ic{color:var(--accent);width:24px;height:24px}
+.top-title{margin-right:auto;min-width:0;font:600 16px/1.2 var(--f-read);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.top-actions{display:flex;align-items:center;gap:4px}
+.icon-btn{width:40px;height:40px;border-radius:50%;border:0;background:transparent;display:grid;place-items:center}
+.icon-btn:hover{background:var(--accent-soft)}
+.btn{height:38px;padding:0 14px;border-radius:10px;border:1px solid var(--line);background:var(--surface);font-weight:500;display:inline-flex;align-items:center;justify-content:center;gap:8px;text-decoration:none;color:var(--ink)}
+.btn:hover{border-color:var(--accent)}
+.btn.primary{background:var(--accent);color:var(--accent-ink);border-color:transparent}
+.btn.primary:hover{filter:brightness(1.06)}
+.btn.danger{color:var(--danger)}
+.btn.sm{height:32px;padding:0 10px;font-size:13px}
+
+/* Biblioteca */
+.page{max-width:1040px;margin:0 auto;padding-top:22px;padding-bottom:130px}
+.lib-head{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;margin-bottom:20px}
+.lib-title{font:600 24px/1.2 var(--f-read);margin:0}
+.lib-title small{font:400 14px var(--f-ui);color:var(--muted);margin-left:8px}
+.search input{width:min(280px,100%);height:38px;border-radius:10px;border:1px solid var(--line);background:var(--surface);padding:0 12px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(138px,1fr));gap:26px 18px}
+.card{display:flex;flex-direction:column;gap:9px;min-width:0}
+.cover-wrap{position:relative}
+.cover{display:block;width:100%;aspect-ratio:2/3;border:0;padding:0;border-radius:4px 9px 9px 4px;overflow:hidden;position:relative;box-shadow:var(--shadow);background:var(--surface)}
+.cover::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(0,0,0,.22),rgba(0,0,0,0) 7%);pointer-events:none}
+.cover img{width:100%;height:100%;object-fit:cover;object-position:top;display:block}
+.cover-ph{position:absolute;inset:0;padding:14px 12px 12px 17px;display:flex;flex-direction:column;justify-content:space-between;text-align:left;color:#fff;background:linear-gradient(160deg,var(--c1),var(--c2))}
+.cover-ph b{font:600 15px/1.25 var(--f-read);display:-webkit-box;-webkit-line-clamp:5;-webkit-box-orient:vertical;overflow:hidden;word-break:break-word}
+.cover-ph small{font:500 10px/1 var(--f-ui);letter-spacing:.14em;text-transform:uppercase;opacity:.85}
+.kind{position:absolute;left:8px;bottom:8px;font:600 9.5px/1 var(--f-ui);letter-spacing:.12em;background:rgba(0,0,0,.62);color:#fff;padding:4px 6px;border-radius:5px;z-index:1}
+.more{position:absolute;top:6px;right:6px;width:30px;height:30px;border-radius:50%;border:0;background:rgba(0,0,0,.5);color:#fff;display:grid;place-items:center;z-index:2}
+.menu{position:absolute;top:40px;right:6px;z-index:5;background:var(--surface);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);padding:6px;display:flex;flex-direction:column;min-width:150px}
+.menu button{display:flex;align-items:center;gap:10px;height:38px;padding:0 10px;border:0;border-radius:8px;background:transparent;text-align:left}
+.menu button:hover{background:var(--accent-soft)}
+.menu .confirm{display:flex;align-items:center;gap:6px;padding:6px 8px;font-size:13px}
+.card-title{font:500 13.5px/1.3 var(--f-ui);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;word-break:break-word}
+.card-meta{font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
+.bar{height:3px;border-radius:2px;background:var(--line);overflow:hidden}
+.bar i{display:block;height:100%;background:var(--accent)}
+.empty{border:1.5px dashed var(--line);border-radius:16px;padding:36px 20px;text-align:center;color:var(--muted);display:flex;flex-direction:column;align-items:center;gap:14px}
+.empty h2{font:600 20px/1.2 var(--f-read);color:var(--ink);margin:0}
+.empty p{margin:0;max-width:34ch}
+.row{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+
+/* Mini reproductor */
+.mini{position:fixed;left:0;right:0;bottom:0;z-index:15;background:var(--surface);border-top:1px solid var(--line);box-shadow:0 -6px 20px rgba(16,24,40,.08);padding-top:10px;padding-bottom:calc(10px + env(safe-area-inset-bottom,0px))}
+.mini-in{max-width:1040px;margin:0 auto;display:flex;align-items:center;gap:10px}
+.mini-txt{flex:1;min-width:0;text-align:left;background:transparent;border:0;padding:0}
+.mini-txt b{display:block;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mini-txt span{font-size:12px;color:var(--muted)}
+.mini .bar{margin-top:5px}
+
+/* Lectura */
+.read{max-width:42rem;margin:0 auto;padding-top:18px;padding-bottom:calc(var(--dock-h) + 36px)}
+.pagebar{display:flex;align-items:center;justify-content:space-between;gap:10px 16px;flex-wrap:wrap;margin-bottom:20px;color:var(--muted);font-size:13px}
+.pg{display:flex;align-items:center;gap:8px}
+.pg input{width:4.4em;height:34px;border-radius:8px;border:1px solid var(--line);background:var(--surface);text-align:center;font-variant-numeric:tabular-nums}
+.text{font:400 var(--fs)/1.75 var(--f-read);hyphens:auto;-webkit-hyphens:auto;touch-action:manipulation}
+.text p{margin:0 0 1.1em}
+.sent{border-radius:4px;padding:1px 0;cursor:pointer;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;-webkit-box-decoration-break:clone;box-decoration-break:clone;transition:background .2s}
+.sent.now{background:var(--hl)}
+.sent.tap{outline:2px solid var(--accent-soft);outline-offset:1px}
+@media (hover:hover){.sent:hover:not(.now){background:var(--hl-soft)}}
+.ref{color:var(--accent);font-weight:500;text-decoration:underline dotted;text-underline-offset:3px}
+.nopage{color:var(--muted);font:italic 15px var(--f-ui);padding:30px 0;text-align:center}
+
+/* Barra de audio */
+.dock{position:fixed;left:0;right:0;bottom:0;z-index:15;background:var(--surface);border-top:1px solid var(--line);box-shadow:0 -8px 24px rgba(16,24,40,.09);padding-top:10px;padding-bottom:calc(12px + env(safe-area-inset-bottom,0px))}
+.dock-in{max-width:42rem;margin:0 auto;display:flex;flex-direction:column;gap:8px}
+.seek-meta{display:flex;justify-content:space-between;gap:8px;font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums;margin-top:2px}
+.transport{display:flex;align-items:center;justify-content:center;gap:6px}
+.t-btn{width:44px;height:44px;border-radius:50%;border:0;background:transparent;display:grid;place-items:center}
+.t-btn:hover{background:var(--accent-soft)}
+.t-btn.play{width:60px;height:60px;background:var(--accent);color:var(--accent-ink);margin:0 6px}
+.t-btn.play:hover{filter:brightness(1.07)}
+.t-btn.play .ic{width:28px;height:28px}
+.mix{display:flex;align-items:center;gap:10px;color:var(--muted)}
+.mix input[type=range]{flex:1}
+.chip{height:30px;padding:0 10px;border-radius:15px;border:1px solid var(--line);background:var(--bg);font-size:13px;font-weight:500;font-variant-numeric:tabular-nums}
+input[type=range]{-webkit-appearance:none;appearance:none;height:22px;background:transparent;width:100%;margin:0}
+input[type=range]::-webkit-slider-runnable-track{height:4px;border-radius:2px;background:linear-gradient(90deg,var(--accent) var(--p,0%),var(--line) var(--p,0%))}
+input[type=range]::-moz-range-track{height:4px;border-radius:2px;background:var(--line)}
+input[type=range]::-moz-range-progress{height:4px;border-radius:2px;background:var(--accent)}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:var(--accent);border:0;margin-top:-7px}
+input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;background:var(--accent);border:0}
+
+/* Hojas (ajustes, añadir, pasajes, editar) */
+.veil{position:fixed;inset:0;z-index:40;background:rgba(10,15,22,.5);display:flex;align-items:flex-end;justify-content:center}
+.sheet{background:var(--surface);width:min(580px,100%);max-height:90vh;overflow:auto;border-radius:18px 18px 0 0;padding-top:18px;padding-bottom:calc(22px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;gap:16px}
+@media (min-width:700px){.veil{align-items:center}.sheet{border-radius:18px}}
+.sh-head{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.sh-head h2{font:600 19px/1.2 var(--f-read);margin:0}
+.field{display:flex;flex-direction:column;gap:6px}
+.field>label,.lbl{font-size:12.5px;font-weight:500;color:var(--muted)}
+.field input[type=text],.field input[type=url],.field select,.field textarea{width:100%;border-radius:10px;border:1px solid var(--line);background:var(--bg);padding:10px 12px}
+.field textarea{min-height:160px;resize:vertical;line-height:1.5}
+.field .val{font-size:13px;font-variant-numeric:tabular-nums;color:var(--ink)}
+.line{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.seg{display:inline-flex;background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:3px;gap:2px;flex-wrap:wrap}
+.seg button{border:0;background:transparent;border-radius:8px;padding:6px 12px;font-weight:500;font-size:13.5px}
+.seg button[aria-pressed="true"]{background:var(--surface);box-shadow:0 1px 3px rgba(16,24,40,.18);color:var(--accent)}
+.drop{border:1.5px dashed var(--line);border-radius:14px;padding:28px 16px;display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center;color:var(--muted);background:var(--bg);cursor:pointer}
+.drop:hover{border-color:var(--accent)}
+.note{font-size:13px;color:var(--muted);margin:0}
+.pass-list{display:flex;flex-direction:column;border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.pass-list a{display:flex;justify-content:space-between;gap:10px;padding:11px 14px;color:var(--ink);text-decoration:none;border-bottom:1px solid var(--line)}
+.pass-list a:last-child{border-bottom:0}
+.pass-list a:hover{background:var(--accent-soft)}
+.pass-list span{color:var(--accent);font-size:13px}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(var(--dock-h) + 18px + env(safe-area-inset-bottom,0px));z-index:50;background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:12px;font-size:14px;max-width:min(92vw,460px);box-shadow:var(--shadow)}
+.busy{position:fixed;inset:0;z-index:60;background:rgba(10,15,22,.55);display:grid;place-items:center}
+.busy-box{background:var(--surface);border-radius:16px;padding:22px 26px;min-width:240px;max-width:86vw;display:flex;flex-direction:column;gap:12px;text-align:center}
+.dropveil{position:fixed;inset:0;z-index:70;background:rgba(10,122,118,.88);color:#fff;display:grid;place-items:center;font:600 22px var(--f-read);text-align:center;padding:20px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+
+/* Herramientas del lector */
+.tools{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+.tool-btn{height:36px;padding:0 12px;border-radius:18px;border:1px solid var(--line);background:var(--surface);display:inline-flex;align-items:center;gap:7px;font-size:13.5px;font-weight:500}
+.tool-btn .ic{width:18px;height:18px}
+.tool-btn:hover{border-color:var(--accent)}
+.tool-btn.on{background:var(--accent);color:var(--accent-ink);border-color:transparent}
+.editarea{display:block;width:100%;min-height:55vh;resize:none;border:1px solid var(--accent);border-radius:12px;background:var(--surface);color:var(--ink);padding:14px;font:400 var(--fs)/1.7 var(--f-read);outline:none}
+.editnote{font-size:13px;color:var(--muted);margin:0 0 10px}
+body.hlmode .sent{-webkit-user-select:text;user-select:text;cursor:text}
+body.hlmode .text ::selection{background:var(--accent-soft)}
+mark.hl{color:#1b1b1b;border-radius:3px;padding:1px 0;-webkit-box-decoration-break:clone;box-decoration-break:clone}
+mark.hl-y{background:#FFEB3B}
+mark.hl-o{background:#FFB74D}
+mark.hl-c{background:#FF8A65}
+mark.hl-p{background:#FF80AB}
+.hlbar{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(var(--dock-h) + 12px + env(safe-area-inset-bottom,0px));z-index:25;background:var(--surface);border:1px solid var(--line);border-radius:26px;box-shadow:var(--shadow);padding:6px 8px;display:flex;align-items:center;gap:6px}
+.sw{width:34px;height:34px;border-radius:50%;border:2px solid var(--surface);box-shadow:0 0 0 1px var(--line);padding:0}
+.sw-y{background:#FFEB3B}.sw-o{background:#FFB74D}.sw-c{background:#FF8A65}.sw-p{background:#FF80AB}
+.hlbar .icon-btn{width:34px;height:34px}
+
+/* Barra de audio plegable */
+.dock-handle{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.dock-handle .grab{flex:1;display:flex;justify-content:center}
+.dock-handle button.fold{height:28px;min-width:64px;border-radius:14px;border:1px solid var(--line);background:var(--bg);display:grid;place-items:center;padding:0 14px}
+.dock-handle .ic{width:18px;height:18px}
+.dock .fold-play{display:none}
+.dock.min .fold-play{display:grid}
+.dock.min .dock-body{display:none}
+.dock.min{padding-top:6px;padding-bottom:calc(6px + env(safe-area-inset-bottom,0px))}
+.dock-handle .sp{width:44px}
+.dock-body{display:flex;flex-direction:column;gap:8px}
+.dock.min .dock-handle .sp{display:none}
+
+/* Teleprompter */
+.tp{position:fixed;inset:0;z-index:35;pointer-events:none}
+.tp[data-scheme="dark"]{--tpbg:0,0,0;--tpfg:#fff;--tpdim:#6f7782;--tpui:#e8eaee}
+.tp[data-scheme="light"]{--tpbg:255,255,255;--tpfg:#101418;--tpdim:#a3abb7;--tpui:#101418}
+.tp[data-scheme="amber"]{--tpbg:0,0,0;--tpfg:#FFD54A;--tpdim:#6b5a22;--tpui:#FFE49A}
+.tp[data-scheme="green"]{--tpbg:0,0,0;--tpfg:#7CFF9B;--tpdim:#2f6b3f;--tpui:#B8FFCB}
+.tp-frame{position:absolute;left:0;right:0;pointer-events:auto;display:flex;flex-direction:column;background:rgba(var(--tpbg),var(--tp-op,1));color:var(--tpfg);padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);box-shadow:0 6px 30px rgba(0,0,0,.35)}
+.tp-frame.top{top:0}.tp-frame.bottom{bottom:0}
+.tp-bar{display:flex;align-items:center;gap:6px;color:var(--tpui);min-height:48px}
+.tp-bar .sp{flex:1}
+.tp-bar .icon-btn,.tp-ctl .icon-btn{color:var(--tpui)}
+.tp-bar .icon-btn:hover,.tp-ctl .icon-btn:hover{background:rgba(255,255,255,.14)}
+.tp[data-scheme="light"] .tp-bar .icon-btn:hover,.tp[data-scheme="light"] .tp-ctl .icon-btn:hover{background:rgba(0,0,0,.08)}
+.tp .seg{background:rgba(127,127,127,.18);border-color:transparent}
+.tp .seg button{color:var(--tpui)}
+.tp .seg button[aria-pressed="true"]{background:var(--tpfg);color:rgb(var(--tpbg));box-shadow:none}
+.tp-scroll{position:relative;flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;touch-action:pan-y}
+.tp-band{position:absolute;left:0;right:0;pointer-events:none;border-top:2px solid var(--accent);border-bottom:2px solid var(--accent);opacity:.55;z-index:2}
+.tp-text{position:relative;margin:0 auto;width:min(100%,var(--tp-w,46rem));font:500 var(--tp-fs,38px)/1.45 var(--f-ui);text-align:var(--tp-al,left);padding:var(--tp-padtop,35%) 18px var(--tp-padbot,55%)}
+.tp-text.mirror{transform:scaleX(-1)}
+.tp-text p{margin:0 0 .8em}
+.tp-text .w{cursor:pointer;-webkit-user-select:none;user-select:none;border-radius:4px;padding:0 1px}
+.tp-text.dim .w.read{color:var(--tpdim)}
+.tp-text .w.cur{background:var(--accent);color:var(--accent-ink)}
+.tp-heard{display:flex;align-items:center;gap:10px;min-height:34px;padding:4px 12px;font-size:14px;color:var(--tpui);border-top:1px solid rgba(127,127,127,.3)}
+.tp-heard .dot{width:10px;height:10px;border-radius:50%;background:#888;flex:none}
+.tp-heard .dot.on{background:#34D399;box-shadow:0 0 0 4px rgba(52,211,153,.3)}
+.tp-heard .dot.hot{background:#FF5C5C;box-shadow:0 0 0 5px rgba(255,92,92,.35)}
+.tp-heard .words{flex:1;min-width:0;display:flex;gap:6px;justify-content:flex-end;overflow:hidden;white-space:nowrap}
+.tp-heard .words span{flex:none}
+.tp-heard .ok{color:#34D399;font-weight:600}
+.tp-heard .no{opacity:.55}
+.tp-ctl{display:flex;align-items:center;justify-content:center;gap:10px;padding:6px 10px 10px;color:var(--tpui)}
+.tp-ctl .t-btn{color:var(--tpui)}
+.tp-ctl .t-btn:hover{background:rgba(127,127,127,.2)}
+.tp-ctl .t-btn.play,.tp-ctl .t-btn.play:hover{background:var(--accent);color:var(--accent-ink)}
+.tp-ctl{gap:6px;flex-wrap:nowrap}
+.tp-ctl .spd{min-width:58px;text-align:center;font:600 13px var(--f-ui);font-variant-numeric:tabular-nums;white-space:nowrap}
+.tp-ctl .rec{width:auto;border-radius:20px;padding:0 10px;display:inline-flex;align-items:center;gap:5px;font-size:13px;font-weight:600;height:36px;border:1px solid currentColor;background:transparent;color:var(--tpui);white-space:nowrap;flex:none}
+.tp-ctl .rec .ic{width:16px;height:16px;color:#E5484D}
+.tp-ctl .rec.on .ic{color:#fff}
+.tp-ctl .rec.on{background:#E5484D;border-color:#E5484D;color:#fff}
+.tp-count{position:absolute;inset:0;display:grid;place-items:center;font:700 clamp(80px,26vw,200px)/1 var(--f-ui);color:var(--tpfg);background:rgba(var(--tpbg),.72);z-index:5}
+@media (max-height:460px){.tp-bar{min-height:40px}.tp-ctl{padding:2px 8px 6px}.tp-heard{min-height:28px;padding:2px 10px}.tp-ctl .t-btn.play{width:48px;height:48px}.tp-ctl .t-btn{width:38px;height:38px}}
+/* Línea de dictado */
+.dl{display:flex;flex-direction:column;gap:6px;min-width:0}
+.dl-row{display:flex;align-items:center;gap:8px;min-width:0}
+.dl-dot{width:12px;height:12px;border-radius:50%;background:#8a93a0;flex:none}
+.dl-dot.on{background:#34D399}
+.dl-dot.hot{background:#FF5C5C;box-shadow:0 0 0 5px rgba(255,92,92,.3)}
+.dl-dot.lost{background:#F5A524;box-shadow:0 0 0 5px rgba(245,165,36,.3)}
+.dictline{flex:1;min-width:0;height:2.6em;resize:none;overflow:hidden;border:1.5px solid var(--accent);border-radius:12px;background:rgba(127,127,127,.12);color:inherit;padding:.55em .8em;font:500 16px/1.45 var(--f-ui);outline:none}
+.dictline.quiet{color:transparent;caret-color:transparent;text-shadow:none}
+.dictline.lostbg{background:#FFE28A;color:#3a2a00}
+.dictline::placeholder{color:inherit;opacity:.55}
+.dl-mic{width:44px;height:44px;border-radius:50%;border:0;flex:none;background:var(--accent);color:var(--accent-ink);display:grid;place-items:center}
+.dl-msg{font-size:13px;line-height:1.35;background:#FFF1D0;color:#5A3B00;border-radius:10px;padding:8px 10px}
+.tp-dictslot{padding-top:6px;padding-bottom:6px;border-bottom:1px solid rgba(127,127,127,.3);color:var(--tpfg)}
+.rec-list{display:flex;flex-direction:column;gap:10px}
+.rec-row{display:flex;flex-direction:column;gap:3px;text-align:left;flex:1;min-width:0;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px 14px}
+.rec-row:hover{border-color:var(--accent)}
+.rec-name{font-weight:600}
+.rec-meta{font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
+.rec-snip{font-size:13.5px;color:var(--muted);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;word-break:break-word}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.scheme{width:44px;height:36px;border-radius:10px;border:2px solid var(--line);font:700 15px var(--f-ui);display:grid;place-items:center}
+.scheme[aria-pressed="true"]{border-color:var(--accent)}
+.scheme.s-dark{background:#000;color:#fff}.scheme.s-light{background:#fff;color:#111}.scheme.s-amber{background:#000;color:#FFD54A}.scheme.s-green{background:#000;color:#7CFF9B}
+.toast-act{margin-left:8px;color:var(--accent);background:transparent;border:0;font-weight:700;text-decoration:underline;padding:2px 4px}
+.rec-item{display:flex;align-items:stretch;gap:4px;position:relative}
+.rec-item.dragging{z-index:60;opacity:.85;filter:drop-shadow(0 8px 14px rgba(0,0,0,.3))}
+.rec-grip{flex:none;width:34px;min-height:44px;align-self:stretch;border:0;background:transparent;color:var(--muted);display:grid;place-items:center;touch-action:none;cursor:grab;border-radius:8px}
+.rec-acts{flex:none;display:flex;flex-direction:column;justify-content:center;gap:2px}
+.rec-edit{font:600 16px var(--f-ui);border:1.5px solid var(--accent);border-radius:8px;padding:4px 8px;background:var(--bg);color:var(--ink);width:100%}
+.trash{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);width:76px;height:76px;border-radius:50%;background:var(--surface);border:2px dashed var(--danger);color:var(--danger);display:grid;place-items:center;z-index:55;box-shadow:var(--shadow);transition:transform .12s,background .12s}
+.trash:not([hidden])::before{content:"";width:34px;height:34px;background:currentColor;-webkit-mask:var(--trash-ic) center/contain no-repeat;mask:var(--trash-ic) center/contain no-repeat}
+.trash.hot{background:var(--danger);color:#fff;transform:translateX(-50%) scale(1.18)}
+.tp.kb .tp-heard{display:none}
+.tp.kb .tp-ctl{padding:2px 8px 4px}
+.tp.kb .tp-bar{min-height:40px}
+.sel{height:38px;border:1px solid var(--line);border-radius:10px;background:var(--bg);padding:0 10px}
+#printArea{display:none}
+@media print{body.printing>*:not(#printArea){display:none!important}body.printing #printArea{display:block;background:#fff;color:#000;font:12pt/1.6 Georgia,serif}body.printing #printArea h1{font-size:18pt;margin:0 0 12pt}body.printing #printArea .pt{white-space:pre-wrap}body.printing::before{display:none}}
+#btnSaveApp{position:relative}
+#btnSaveApp .sdot{position:absolute;top:7px;right:7px;width:9px;height:9px;border-radius:50%;background:#F5A524;border:2px solid var(--bg);display:none}
+#btnSaveApp.dirty .sdot{display:block}
+#btnSaveApp.ok{color:var(--accent)}
+.help h3{font:600 15px var(--f-ui);margin:14px 0 4px}
+.help ol{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:3px;font-size:14px;line-height:1.5}
+.savehint{display:block;width:100%;max-width:1040px;margin:0 auto;border:0;background:transparent;color:#B26A00;font:600 11.5px/1 var(--f-ui);text-align:right;padding-top:0;padding-bottom:6px;cursor:pointer}
+.ctxmenu{position:fixed;z-index:200;background:var(--surface);border:1px solid var(--line);border-radius:10px;box-shadow:var(--shadow);padding:4px}
+.ctxmenu button{display:block;border:0;background:transparent;color:var(--ink);font:600 14px var(--f-ui);padding:9px 16px;border-radius:7px;cursor:pointer}
+.ctxmenu button:hover{background:var(--accent-soft,rgba(0,128,128,.12))}
+.sent.flash{background:var(--hl);outline:2px solid var(--accent);outline-offset:2px;border-radius:4px;transition:background .3s}
+.pass-row{display:flex;align-items:stretch;border-bottom:1px solid var(--line)}
+.pass-row:last-child{border-bottom:0}
+.pass-list .pass-row a{flex:1;min-width:0;border-bottom:0}
+.pass-back{flex:none;border:0;border-left:1px solid var(--line);background:transparent;color:var(--accent);font:600 13px var(--f-ui);padding:0 12px;cursor:pointer;white-space:nowrap}
+.pass-back:hover{background:var(--accent-soft)}
+.srch-list{display:flex;flex-direction:column;border:1px solid var(--line);border-radius:12px;overflow:auto;max-height:55vh}
+.srch-list:empty{display:none}
+.srch-row{display:flex;gap:10px;text-align:left;border:0;border-bottom:1px solid var(--line);background:transparent;color:var(--ink);padding:10px 12px;font:400 14px/1.45 var(--f-ui);cursor:pointer}
+.srch-row:last-child{border-bottom:0}.srch-row:hover{background:var(--accent-soft)}
+.srch-pg{flex:none;color:var(--muted);font-size:12px;min-width:46px;padding-top:2px}
+.srch-tx{min-width:0;overflow-wrap:anywhere}.srch-tx mark{background:var(--hl);color:inherit;border-radius:3px;padding:0 1px}
+</style><style>body{margin:0}html{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}img{max-width:100%}</style></head><body>
+
+<header class="top">
+  <div class="top-in gx">
+    <button class="icon-btn" id="btnBack" hidden aria-label="Volver a la biblioteca"></button>
+    <div class="brand" id="brand"><svg class="ic f" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="9" width="3.5" height="6" rx="1.75"/><rect x="10" y="4" width="3.5" height="16" rx="1.75"/><rect x="17" y="8" width="3.5" height="8" rx="1.75"/></svg><span>LeamosTxTs</span></div>
+    <div class="top-title" id="readerTitle" hidden></div>
+    <div class="top-actions">
+      <button class="icon-btn" id="btnDict" aria-label="Dictar un texto"></button>
+      <button class="btn primary" id="btnAdd"></button>
+      <button class="icon-btn" id="btnSearch" hidden aria-label="Buscar en el documento"></button>
+      <button class="icon-btn" id="btnPassages" hidden aria-label="Pasajes bíblicos"></button>
+      <button class="icon-btn" id="btnSaveApp" aria-label="Guardar copia de la app con mis datos"></button>
+      <button class="icon-btn" id="btnSettings" aria-label="Ajustes"></button>
+    </div>
+  </div>
+  <button class="savehint gx" id="saveHint" type="button" hidden>Guarda el documento para no perder el avance ↑</button>
+</header>
+
+<main id="viewLib" class="page gx">
+  <div class="lib-head">
+    <div style="display:flex;align-items:center;gap:6px"><h1 class="lib-title">Tus libros<small id="libCount"></small></h1><button class="icon-btn" id="btnHelp" aria-label="Ayuda: cómo usar la app"></button></div>
+    <label class="search"><input id="q" type="search" placeholder="Buscar por título" aria-label="Buscar en la biblioteca"></label>
+  </div>
+  <div class="seg" id="libTabs" style="margin-bottom:18px"><button data-t="books">Libros</button><button data-t="recs">Textos grabados</button></div>
+  <div class="chips" id="kindChips" style="margin-bottom:16px"><button class="chip" data-k="all">Todos <i></i></button><button class="chip" data-k="pdf">PDF <i></i></button><button class="chip" data-k="docx">Word <i></i></button><button class="chip" data-k="txt">Texto y pegados <i></i></button></div>
+  <div class="grid" id="grid"></div>
+  <div id="recWrap" hidden>
+    <div class="row" style="justify-content:flex-start;margin-bottom:14px"><button class="btn primary" id="recNew"></button><button class="btn" id="recBackup">Respaldo</button></div>
+    <div class="rec-list" id="recList"></div>
+  </div>
+  <div class="empty" id="empty" hidden>
+    <h2>Aquí aparecerán tus libros</h2>
+    <p>Arrastra un PDF, un Word o un TXT, o pega texto copiado. Quedará guardado con tu avance.</p>
+    <div class="row"><button class="btn primary" id="emptyAdd"></button></div>
+  </div>
+</main>
+
+<main id="viewRead" class="read gx" hidden>
+  <div class="tools" id="tools">
+    <button class="tool-btn" id="btnEdit" aria-pressed="false"></button>
+    <button class="tool-btn" id="btnHl" aria-pressed="false"></button>
+    <button class="tool-btn" id="btnTp"></button>
+  </div>
+  <div class="pagebar">
+    <div class="pg"><label for="pgInput">Página</label><input id="pgInput" type="number" min="1" inputmode="numeric"><span>de <span id="pgTotal">1</span></span></div>
+    <div id="hint">Toca dos veces una frase para leer desde ahí</div>
+  </div>
+  <article id="text" class="text" lang="es"></article>
+</main>
+
+<footer class="dock" id="dock" hidden>
+  <div class="gx"><div class="dock-in">
+    <div class="dock-handle">
+      <span class="sp"></span>
+      <span class="grab"><button class="fold" id="dockFold" aria-label="Bajar los controles de audio" title="Bajar o subir los controles"></button></span>
+      <button class="t-btn fold-play" id="foldPlay" aria-label="Reproducir" style="width:44px;height:44px"></button><span class="sp"></span>
+    </div>
+    <div class="dock-body">
+    <div>
+      <input id="seek" type="range" min="0" max="0" value="0" aria-label="Avance de lectura">
+      <div class="seek-meta"><span id="seekPage"></span><span id="seekPct"></span><span id="seekEta"></span></div>
+    </div>
+    <div class="transport">
+      <button class="t-btn" id="bStop" aria-label="Detener y volver al inicio de la página" title="Detener"></button>
+      <button class="t-btn" id="bPrevPage" aria-label="Página anterior" title="Página anterior"></button>
+      <button class="t-btn" id="bPrev" aria-label="Frase anterior" title="Frase anterior"></button>
+      <button class="t-btn play" id="bPlay" aria-label="Reproducir"></button>
+      <button class="t-btn" id="bNext" aria-label="Frase siguiente" title="Frase siguiente"></button>
+      <button class="t-btn" id="bNextPage" aria-label="Página siguiente" title="Página siguiente"></button>
+    </div>
+    <div class="mix">
+      <span id="volIc"></span>
+      <input id="vol" type="range" min="0" max="100" value="100" aria-label="Volumen">
+      <button class="chip" id="rateChip" aria-label="Velocidad de lectura">1×</button>
+    </div>
+    </div>
+  </div></div>
+</footer>
+
+<div class="mini" id="mini" hidden>
+  <div class="gx"><div class="mini-in">
+    <button class="mini-txt" id="miniOpen"><b id="miniTitle"></b><span id="miniMeta"></span><div class="bar"><i id="miniBar" style="width:0"></i></div></button>
+    <button class="t-btn play" id="miniPlay" aria-label="Reproducir" style="width:48px;height:48px;margin:0"></button>
+    <button class="icon-btn" id="miniClose" aria-label="Cerrar reproductor"></button>
+  </div></div>
+</div>
+
+<!-- Ajustes -->
+<div class="veil" id="shSettings" hidden><div class="sheet gx">
+  <div class="sh-head"><h2>Ajustes</h2><button class="icon-btn" data-close aria-label="Cerrar"></button></div>
+  <div class="field"><span class="lbl">Idioma de la voz</span>
+    <div class="seg" id="langSeg"><button data-lang="es">Español</button><button data-lang="en">English</button><button data-lang="pt">Português</button><button data-lang="auto">Automático</button></div>
+    <p class="note">«Automático» lee en el idioma del documento (español, inglés o portugués). Por defecto: español.</p></div>
+  <div class="field"><label for="voiceSel">Voz del dispositivo</label>
+    <div class="line"><select id="voiceSel"></select><button class="btn sm" id="voiceTest">Probar</button></div>
+    <p class="note" id="voiceNote"></p></div>
+  <div class="field"><div class="line"><label for="setVol">Volumen</label><span class="val" id="setVolVal"></span></div>
+    <input id="setVol" type="range" min="0" max="100"></div>
+  <div class="field"><div class="line"><label for="setRate">Velocidad</label><span class="val" id="setRateVal"></span></div>
+    <input id="setRate" type="range" min="60" max="180"></div>
+  <div class="field"><span class="lbl">Tamaño de letra</span>
+    <div class="line"><div class="seg"><button id="fsDown" aria-label="Letra más pequeña">A−</button><button id="fsUp" aria-label="Letra más grande">A+</button></div><span class="val" id="fsVal"></span></div></div>
+  <div class="field"><label for="bibleVer">Versión bíblica (BibleGateway)</label>
+    <select id="bibleVer"></select>
+    <div class="line" style="margin-top:6px"><label for="bibleOn" style="font-size:14px;color:var(--ink)">Reconocer pasajes bíblicos en el texto</label><input type="checkbox" id="bibleOn"></div></div>
+  <div class="line"><label for="wakeOn" style="font-size:14px">Mantener la pantalla encendida mientras leo</label><input type="checkbox" id="wakeOn"></div>
+  <div class="line"><label for="editCopy" style="font-size:14px">Al editar, crear una copia en vez de cambiar el original</label><input type="checkbox" id="editCopy"></div>
+  <div class="line"><label for="autoPunct" style="font-size:14px">Puntuación automática al dictar y grabar (puntos, comas, mayúsculas, ¿?). También entiende «coma», «punto», «punto y aparte»…</label><input type="checkbox" id="autoPunct"></div>
+  <div class="line"><label for="autoSave" style="font-size:14px">Autoguardar la app cada 30 min (tras guardar a mano una vez)</label><input type="checkbox" id="autoSave"></div>
+  <div class="line"><span style="font-size:14px">Respaldo de libros y textos</span><button class="btn sm" id="openBackup">Abrir</button></div>
+  <p class="note">Si el teléfono pausa la voz al apagar la pantalla, vuelve a pulsar reproducir y seguirá donde quedó.</p>
+</div></div>
+
+<!-- Añadir -->
+<div class="veil" id="shAdd" hidden><div class="sheet gx">
+  <div class="sh-head"><h2>Añadir a la biblioteca</h2><button class="icon-btn" data-close aria-label="Cerrar"></button></div>
+  <div class="seg" id="addTabs" style="align-self:flex-start"><button data-tab="file">Archivo</button><button data-tab="text">Texto</button><button data-tab="link">Enlace</button></div>
+  <div data-panel="file">
+    <label class="drop" for="fileIn" id="dropZone"><span id="dropIc"></span><b style="color:var(--ink)">Elegir archivos</b><span>PDF, DOCX, TXT o un respaldo .json. También puedes arrastrarlos a cualquier parte de la página.</span></label>
+    <input id="fileIn" type="file" multiple hidden accept=".pdf,.docx,.doc,.txt,.md,.json,application/json,application/pdf,text/plain,application/vnd.openxmlformats-officedocument.wordprocessingml.document">
+  </div>
+  <div data-panel="text" hidden class="field" style="gap:12px">
+    <div class="field"><label for="txTitle">Título</label><input id="txTitle" type="text" maxlength="120" placeholder="Apuntes"></div>
+    <div class="field"><label for="txBody">Texto</label><textarea id="txBody" placeholder="Pega aquí el texto copiado"></textarea></div>
+    <p class="note" id="txHint" hidden>Parece un enlace. Usa la pestaña Enlace para abrirlo y copiar su texto.</p>
+    <div class="row" style="justify-content:flex-end"><button class="btn" id="txSave">Solo guardar</button><button class="btn primary" id="txSaveRead">Guardar y leer</button></div>
+  </div>
+  <div data-panel="link" hidden class="field" style="gap:12px">
+    <div class="field"><label for="lkUrl">Dirección del enlace</label><input id="lkUrl" type="url" placeholder="https://"></div>
+    <p class="note">Por seguridad, esta página no puede descargar el contenido de otros sitios. Abre el enlace, copia el texto y pégalo aquí; la dirección queda guardada como fuente.</p>
+    <div class="row" style="justify-content:flex-end"><a class="btn" id="lkOpen" target="_blank" rel="noopener noreferrer" href="#">Abrir enlace</a><button class="btn primary" id="lkPaste">Pegar el texto copiado</button></div>
+  </div>
+</div></div>
+
+<!-- Pasajes -->
+<div class="veil" id="shPass" hidden><div class="sheet gx">
+  <div class="sh-head"><h2>Pasajes bíblicos</h2><button class="icon-btn" data-close aria-label="Cerrar"></button></div>
+  <div class="field"><span class="lbl">Versión</span><div class="seg" id="passVer"></div></div>
+  <div class="seg" id="passScope" style="align-self:flex-start"><button data-scope="page">Esta página</button><button data-scope="all">Todo el libro</button></div>
+  <div id="passList"></div>
+</div></div>
+
+<!-- Buscar -->
+<div class="veil" id="shSearch" hidden><div class="sheet gx">
+  <div class="sh-head"><h2>Buscar en el documento</h2><button class="icon-btn" data-close aria-label="Cerrar"></button></div>
+  <div class="field"><input id="srchInput" type="search" placeholder="Palabra, frase o verso (Juan 3:16)" autocomplete="off" enterkeyhint="search"></div>
+  <p class="note" id="srchCount"></p>
+  <div class="srch-list" id="srchList"></div>
+</div></div>
+
+<!-- Editar -->
+<div class="veil" id="shEdit" hidden><div class="sheet gx">
+  <div class="sh-head"><h2>Editar apunte</h2><button class="icon-btn" data-close aria-label="Cerrar"></button></div>
+  <div class="field"><label for="edTitle">Título</label><input id="edTitle" type="text" maxlength="120"></div>
+  <div class="field"><label for="edText">Texto (la línea ⁂ salto de página ⁂ separa las páginas)</label><textarea id="edText" style="min-height:38vh"></textarea></div>
+  <div class="row" style="justify-content:flex-end"><button class="btn" data-close>Cancelar</button><button class="btn primary" id="edSave">Guardar cambios</button></div>
+</div></div>
+
+<!-- Paleta de resaltado -->
+<div class="hlbar" id="hlbar" hidden>
+  <button class="sw sw-y" data-c="y" aria-label="Amarillo"></button><button class="sw sw-o" data-c="o" aria-label="Naranja"></button>
+  <button class="sw sw-c" data-c="c" aria-label="Coral"></button><button class="sw sw-p" data-c="p" aria-label="Rosa"></button>
+  <button class="icon-btn" data-c="x" aria-label="Quitar resaltado" title="Quitar resaltado"></button>
+</div>
+
+<!-- Teleprompter -->
+<div class="tp" id="tp" hidden data-scheme="dark">
+  <div class="tp-frame top" id="tpFrame">
+    <div class="tp-bar gx">
+      <button class="icon-btn" id="tpClose" aria-label="Cerrar teleprompter"></button>
+      <div class="seg" id="tpMode"><button data-m="voz">Mi voz</button><button data-m="auto">Automático</button><button data-m="manual">Manual</button></div>
+      <span class="sp"></span>
+      <button class="icon-btn" id="tpSet" aria-label="Ajustes del teleprompter"></button>
+    </div>
+    <div class="tp-dictslot gx" id="tpDictSlot" hidden></div>
+    <div class="tp-scroll" id="tpScroll"><div class="tp-band" id="tpBand"></div><div class="tp-text" id="tpText"></div></div>
+    <div class="tp-heard gx" id="tpHeard"><span class="dot" id="tpDot"></span><span class="words" id="tpWords"></span></div>
+    <div class="tp-ctl gx">
+      <button class="rec" id="tpRec" aria-pressed="false"></button>
+      <button class="t-btn" id="tpSlow" aria-label="Más lento"></button>
+      <button class="t-btn play" id="tpPlay" aria-label="Iniciar"></button>
+      <button class="t-btn" id="tpFast" aria-label="Más rápido"></button>
+      <span class="spd" id="tpSpd"></span>
+    </div>
+    <div class="tp-count" id="tpCount" hidden></div>
+  </div>
+</div>
+<div class="veil" id="shTp" hidden><div class="sheet gx">
+  <div class="sh-head"><h2>Ajustes del teleprompter</h2><button class="icon-btn" data-close aria-label="Cerrar"></button></div>
+  <div class="field"><span class="lbl">Altura del marco</span>
+    <div class="seg" id="tpH"><button data-h="100">Completo</button><button data-h="75">3/4</button><button data-h="50">Mitad</button><button data-h="33">1/3</button></div></div>
+  <div class="field"><span class="lbl">Posición del marco</span>
+    <div class="seg" id="tpAnchor"><button data-a="top">Arriba</button><button data-a="bottom">Abajo</button></div></div>
+  <div class="field"><div class="line"><label for="tpOp">Transparencia del fondo</label><span class="val" id="tpOpVal"></span></div><input id="tpOp" type="range" min="20" max="100"></div>
+  <div class="field"><div class="line"><label for="tpFs">Tamaño de letra</label><span class="val" id="tpFsVal"></span></div><input id="tpFs" type="range" min="18" max="90"></div>
+  <div class="field"><div class="line"><label for="tpWpm">Velocidad automática</label><span class="val" id="tpWpmVal"></span></div><input id="tpWpm" type="range" min="40" max="300"></div>
+  <div class="field"><div class="line"><label for="tpBandPos">Posición de la línea guía</label><span class="val" id="tpBandVal"></span></div><input id="tpBandPos" type="range" min="12" max="70"></div>
+  <div class="field"><span class="lbl">Ancho del texto</span>
+    <div class="seg" id="tpW"><button data-w="30">Estrecho</button><button data-w="46">Medio</button><button data-w="70">Ancho</button></div></div>
+  <div class="field"><span class="lbl">Alineación</span>
+    <div class="seg" id="tpAl"><button data-al="left">Izquierda</button><button data-al="center">Centro</button></div></div>
+  <div class="field"><span class="lbl">Colores</span>
+    <div class="chips" id="tpScheme"><button class="scheme s-dark" data-s="dark" aria-label="Blanco sobre negro">Aa</button><button class="scheme s-light" data-s="light" aria-label="Negro sobre blanco">Aa</button><button class="scheme s-amber" data-s="amber" aria-label="Amarillo sobre negro">Aa</button><button class="scheme s-green" data-s="green" aria-label="Verde sobre negro">Aa</button></div></div>
+  <div class="line"><label for="tpMirror" style="font-size:14px">Espejo (para cristal reflectante)</label><input type="checkbox" id="tpMirror"></div>
+  <div class="line"><label for="tpDim" style="font-size:14px">Atenuar lo que ya leí</label><input type="checkbox" id="tpDim"></div>
+  <div class="line"><label for="tpCount3" style="font-size:14px">Cuenta regresiva 3, 2, 1 al iniciar</label><input type="checkbox" id="tpCount3"></div>
+  <div class="line"><label for="tpWake" style="font-size:14px">Mantener la pantalla encendida</label><input type="checkbox" id="tpWake"></div>
+  <p class="note">Mi voz y Grabar texto usan el dictado de tu teclado: toca la línea de texto y pulsa el micrófono del teclado (en la PC, Windows + H o el dictado de tu sistema). La página recibe solo texto, así que no puede grabar audio.</p>
+</div></div>
+
+<!-- Dictar un texto -->
+<div class="veil" id="shDict" hidden><div class="sheet gx">
+  <div class="sh-head"><h2>Dictar un texto</h2><button class="icon-btn" data-close aria-label="Cerrar"></button></div>
+  <p class="note">Toca la línea y usa el micrófono de tu teclado. Todo lo que dictes se guarda en Textos grabados al pulsar Guardar.</p>
+  <div id="shDictSlot"></div>
+  <div class="line"><span class="val" id="dictCount">0 palabras</span><span class="val" id="dictTime">00:00</span></div>
+  <div class="field"><label for="dictName">Nombre</label><input id="dictName" type="text" maxlength="120"></div>
+  <div class="row" style="justify-content:flex-end"><button class="btn" id="dictDiscard">Descartar</button><button class="btn primary" id="dictSaveBtn">Guardar</button></div>
+</div></div>
+
+<!-- Texto grabado -->
+<div class="veil" id="shRec" hidden><div class="sheet gx">
+  <div class="sh-head"><h2>Texto grabado</h2><button class="icon-btn" data-close aria-label="Cerrar"></button></div>
+  <div class="field"><label for="recName">Nombre</label><input id="recName" type="text" maxlength="120"></div>
+  <div class="field"><label for="recText">Texto</label><textarea id="recText" style="min-height:28vh"></textarea></div>
+  <p class="note" id="recNote"></p>
+  <div class="field"><label for="recFmt">Formato del archivo</label><select id="recFmt" class="sel"><option value="txt">Texto (.txt)</option><option value="docx">Word (.docx)</option><option value="pdf">PDF (.pdf)</option></select></div>
+  <div class="row" style="justify-content:flex-start">
+    <button class="btn primary" id="recSave">Guardar cambios</button>
+    <button class="btn" id="recSaveFile">Descargar archivo</button>
+    <button class="btn" id="recShare">Compartir…</button>
+    <button class="btn" id="recPrint">Imprimir</button>
+    <a class="btn" id="recWa" target="_blank" rel="noopener noreferrer" href="#">WhatsApp (solo texto)</a>
+    <button class="btn" id="recCopy">Copiar</button>
+    <button class="btn" id="recBook">Pasar a Libros para escucharlo</button>
+    <button class="btn danger" id="recDel">Eliminar</button>
+  </div>
+</div></div>
+
+<!-- No se pudo guardar -->
+<div class="veil" id="shSave" hidden><div class="sheet gx">
+  <div class="sh-head"><h2>No se pudo guardar</h2><button class="icon-btn" data-close aria-label="Cerrar"></button></div>
+  <p class="note" id="saveWhy"></p>
+  <div class="field" id="saveTextBox"><label for="saveText">Texto (mantén pulsado para seleccionar)</label><textarea id="saveText" readonly style="min-height:30vh"></textarea>
+    <div class="row" style="justify-content:flex-end"><button class="btn primary" id="saveCopy">Copiar todo</button></div>
+    <span class="lbl">O envíalo por WhatsApp (se parte en mensajes cortos)</span><div class="row" id="saveParts" style="justify-content:flex-start"></div></div>
+  <div class="row" style="justify-content:flex-start"><button class="btn" id="saveRetry">Reintentar guardar archivo</button></div>
+  <p class="note">Tus textos siguen guardados dentro de «Textos grabados».</p>
+</div></div>
+
+<div class="trash" id="trash" hidden aria-hidden="true"></div>
+
+<!-- Ayuda -->
+<div class="veil" id="shHelp" hidden><div class="sheet gx">
+  <div class="sh-head"><h2>Cómo usar LeamosTxTs</h2><button class="icon-btn" data-close aria-label="Cerrar"></button></div>
+  <div class="help">
+    <h3>Leer</h3>
+    <ol><li>Arrastra o elige un PDF, Word o TXT, o pega texto con «Añadir».</li><li>Pulsa play. Con doble toque en una frase, empieza desde ahí.</li></ol>
+    <h3>Dictar un texto</h3>
+    <ol><li>Abre «Textos grabados» y pulsa «Dictar».</li><li>Toca la línea y pulsa el micrófono del teclado de Google. Habla.</li><li>Si se corta, toca el micrófono otra vez.</li><li>Pulsa «Guardar». El nombre es la fecha y hora; puedes cambiarlo.</li></ol>
+    <h3>Teleprompter</h3>
+    <ol><li>Abre un libro y pulsa «Teleprompter».</li><li>Elige «Mi voz», pulsa «Grabar» si quieres guardar lo dictado y luego play. Lee en voz alta con el micrófono del teclado.</li><li>Al terminar pulsa «Guardar».</li></ol>
+    <h3>Micrófono directo (opcional)</h3>
+    <ol><li>Si «Mi voz» te dice que no hay permiso, es porque el celular no deja usar el micrófono en una página abierta como archivo.</li><li>Solución: súbela a un sitio https gratuito, por ejemplo Netlify Drop (app.netlify.com/drop) o GitHub Pages. Sube el archivo original de la app, no tu copia con datos, porque el enlace es público.</li><li>Abre el enlace https en Chrome y acepta el micrófono. Tus datos se siguen guardando en tu navegador.</li></ol>
+    <h3>Puntuación al dictar</h3>
+    <ol><li>Di «coma», «punto», «punto y aparte», «dos puntos», «signo de interrogación», «abrir paréntesis»… y se convierten en el signo.</li><li>Cada pausa larga cierra la frase con punto y la siguiente empieza con mayúscula. Se puede apagar en Ajustes.</li></ol>
+    <h3>Sacar un texto</h3>
+    <ol><li>En «Textos grabados» toca el texto, elige el formato (.txt, Word o PDF) y «Descargar archivo».</li><li>«Compartir…» abre el menú del teléfono (WhatsApp, Drive, correo). «Imprimir» lo manda a imprimir.</li></ol>
+    <h3>Guardar todo (importante)</h3>
+    <ol><li>Pulsa el botón del disquete, arriba a la derecha, o Ctrl+G.</li><li>Se guarda un archivo .html con tus libros y textos adentro. Úsalo como tu app: al abrirlo, todo está ahí.</li><li>En computadora con Chrome o Edge, la primera vez eliges dónde guardarlo; después Ctrl+G y el autoguardado lo sobrescriben solos.</li><li>En el celular el navegador no deja sobrescribir en silencio: cada 30 min, si hay cambios, la app te avisa y tú tocas «Guardar ahora». Con el teleprompter abierto espera a que lo cierres.</li></ol>
+    <h3>Ordenar</h3>
+    <ol><li>Lápiz: cambia el nombre. Botón de copia: duplica. Mantén pulsado el punteado y arrastra al tacho: elimina (puedes deshacer).</li><li>Para pasar todo a otro aparato: «Respaldo» → «Descargar respaldo» o «Compartir…», y en el otro «Importar».</li></ol>
+  </div>
+</div></div>
+
+<!-- Respaldo -->
+<div class="veil" id="shBackup" hidden><div class="sheet gx">
+  <div class="sh-head"><h2>Respaldo</h2><button class="icon-btn" data-close aria-label="Cerrar"></button></div>
+  <p class="note" id="bkInfo"></p>
+  <div class="field"><span class="lbl">Exportar libros y textos grabados</span>
+    <div class="row" style="justify-content:flex-start"><button class="btn primary" id="bkDl">Descargar respaldo</button><button class="btn" id="bkShare">Compartir…</button><button class="btn" id="bkCopy">Copiar respaldo</button></div></div>
+  <div class="field"><span class="lbl">Importar</span>
+    <label class="drop" for="bkFile" style="padding:18px 12px"><b style="color:var(--ink)">Elegir un archivo de respaldo (.json)</b></label>
+    <input id="bkFile" type="file" hidden accept=".json,application/json">
+    <textarea id="bkPaste" placeholder="O pega aquí el respaldo copiado" style="min-height:70px;border-radius:10px;border:1px solid var(--line);background:var(--bg);padding:10px 12px"></textarea>
+    <div class="row" style="justify-content:flex-end"><button class="btn" id="bkImport">Importar el texto pegado</button></div></div>
+  <div class="field"><span class="lbl">App con mis datos adentro</span>
+    <div class="row" style="justify-content:flex-start"><button class="btn" id="bkApp">Descargar la app con mis datos (.html)</button></div>
+    <p class="note">Es un solo archivo que ya trae tus libros y textos: ábrelo en cualquier navegador y todo está ahí.</p></div>
+  <div class="field"><span class="lbl">Google Drive</span>
+    <p class="note">Pulsa «Compartir…» y elige Drive en el menú del teléfono, o sube el archivo descargado desde drive.google.com.</p></div>
+    <p class="note">Sube allí el archivo descargado. Para recuperarlo, pulsa «Elegir un archivo de respaldo» y búscalo en Drive desde el selector de archivos.</p></div>
+</div></div>
+
+<div class="busy" id="busy" hidden><div class="busy-box"><b id="busyMsg">Procesando…</b><div class="bar"><i id="busyBar" style="width:0"></i></div></div></div>
+<div class="dropveil" id="dropVeil" hidden>Suelta tus archivos para añadirlos a la biblioteca</div>
+<div class="toast" id="toast" role="status" hidden></div>
+<div id="printArea"></div>
+<script type="application/json" id="embeddedData"></script>
+<script>
+(function(){'use strict';const PRISTINE=document.documentElement.outerHTML;
+/*CORE-START*/
+const ABBR=new Set(['dr','dra','sr','sra','srta','lic','ing','prof','pag','pags','cap','caps','vs','etc','gn','ex','lv','nm','dt','jos','jue','rt','sal','pr','ec','cnt','is','jer','lm','ez','dn','os','jl','am','abd','jon','mi','nah','hab','sof','hag','zac','mal','mt','mr','mc','lc','jn','hch','ro','co','cor','ga','ef','fil','col','ts','tes','ti','tim','tit','flm','heb','stg','sant','pe','ped','jud','ap','apoc','re','cr','cro','sam','ed','num','deut','gen','eze','est','esd','neh','prov','ecl','isa','dan','miq','art','tel','av']);
+const normPlain=s=>s.normalize('NFD').replace(/[̀-ͯ]/g,'');
+const normKey=s=>normPlain(s.toLowerCase()).replace(/[\s.ºª]/g,'');
+
+function chunkLong(s){
+  if(s.length<=260) return [s];
+  const out=[];
+  while(s.length>260){
+    const seg=s.slice(0,260);
+    const idx=Math.max(seg.lastIndexOf(', '),seg.lastIndexOf('; '),seg.lastIndexOf(': '));
+    let cut=idx>100?idx+1:seg.lastIndexOf(' ');
+    if(cut<=0) cut=260;
+    out.push(s.slice(0,cut).trim()); s=s.slice(cut).trim();
+  }
+  if(s) out.push(s);
+  return out;
+}
+function splitRaw(par){
+  const out=[]; let start=0;
+  const re=/[.!?…]+["”»')\]]*\s+(?=[A-ZÁÉÍÓÚÑÜ¿¡"“«(\[])/g;
+  let m;
+  while((m=re.exec(par))){
+    const end=m.index+m[0].length;
+    const before=par.slice(start,m.index+1);
+    if(m[0][0]==='.'){
+      const w=(before.match(/([A-Za-zÁÉÍÓÚÑáéíóúñü]+)\.$/)||[])[1];
+      if(w && (w.length===1 || ABBR.has(normPlain(w.toLowerCase())))) continue;
+      if(/(^|\s)\d+\.$/.test(before)) continue;
+    }
+    out.push(par.slice(start,end).trim()); start=end;
+  }
+  const rest=par.slice(start).trim(); if(rest) out.push(rest);
+  return out;
+}
+const splitSentences=par=>splitRaw(par).flatMap(chunkLong);
+
+function softParas(p){
+  if(p.length<=1300) return [p];
+  const out=[]; let buf='';
+  for(const s of splitRaw(p)){
+    if(buf && buf.length+s.length>900){ out.push(buf); buf=s; } else buf=buf?buf+' '+s:s;
+  }
+  if(buf) out.push(buf);
+  return out;
+}
+function textToParas(raw){
+  let t=raw.replace(/\r\n?/g,'\n').replace(/[ \t]/g,' ').replace(/[​﻿]/g,'').replace(/ {2,}/g,' ');
+  t=t.replace(/(\p{L})-\n[ ]*(\p{Ll})/gu,'$1$2');
+  const hasBlank=/\n\s*\n/.test(t);
+  let paras=hasBlank?t.split(/\n\s*\n+/).map(p=>p.replace(/\s*\n\s*/g,' ').trim()):t.split('\n').map(p=>p.trim());
+  return paras.filter(Boolean).flatMap(softParas);
+}
+function paginate(paras,limit=2200){
+  const pages=[]; let cur=[],len=0;
+  for(const p of paras){
+    if(len+p.length>limit && cur.length){ pages.push(cur.join('\n\n')); cur=[]; len=0; }
+    cur.push(p); len+=p.length;
+  }
+  if(cur.length) pages.push(cur.join('\n\n'));
+  return pages.length?pages:[''];
+}
+function buildIndex(pages){
+  const sents=[],pageStarts=[],paraMap=[];
+  pages.forEach((txt,p)=>{
+    pageStarts.push(sents.length);
+    const pp=[];
+    for(const para of txt.split(/\n{2,}/).map(s=>s.trim()).filter(Boolean)){
+      const idxs=[];
+      for(const s of splitSentences(para)){ idxs.push(sents.length); sents.push({t:s,p}); }
+      pp.push(idxs);
+    }
+    paraMap.push(pp);
+  });
+  const cum=new Float64Array(sents.length+1);
+  sents.forEach((s,i)=>{cum[i+1]=cum[i]+s.t.length;});
+  return {sents,pageStarts,paraMap,cum};
+}
+
+/* Pasajes bíblicos */
+const BOOKS=[
+['Génesis','gen','gn'],['Éxodo','exo','ex'],['Levítico','lev','lv'],['Números','num','nm'],['Deuteronomio','deut','dt'],
+['Josué','jos'],['Jueces','jue','jc'],['Rut'],['1 Samuel','1 sam'],['2 Samuel','2 sam'],['1 Reyes','1 re','1 rey'],['2 Reyes','2 re','2 rey'],
+['1 Crónicas','1 cr','1 cro','1 cron'],['2 Crónicas','2 cr','2 cro','2 cron'],['Esdras','esd'],['Nehemías','neh'],['Ester','est'],['Job'],
+['Salmos','salmo','sal','sl'],['Proverbios','prov','pr'],['Eclesiastés','ecl','ec'],['Cantares','cantar de los cantares','cantares de salomon','cant','cnt'],
+['Isaías','isa','is'],['Jeremías','jer'],['Lamentaciones','lam'],['Ezequiel','eze','ez'],['Daniel','dan','dn'],['Oseas','ose','os'],['Joel','jl'],
+['Amós','am'],['Abdías','abd'],['Jonás','jon'],['Miqueas','miq'],['Nahúm','nah'],['Habacuc','hab'],['Sofonías','sof'],['Hageo','hag'],['Zacarías','zac'],['Malaquías','mal'],
+['Mateo','mat','mt'],['Marcos','mar','mr','mc'],['Lucas','luc','lc'],['Juan','jn'],['Hechos','hch','hec'],['Romanos','rom','ro'],
+['1 Corintios','1 cor','1 co'],['2 Corintios','2 cor','2 co'],['Gálatas','gal','ga'],['Efesios','efe','ef'],['Filipenses','fil','flp'],['Colosenses','col'],
+['1 Tesalonicenses','1 tes','1 ts'],['2 Tesalonicenses','2 tes','2 ts'],['1 Timoteo','1 tim','1 ti'],['2 Timoteo','2 tim','2 ti'],['Tito','tit'],['Filemón','flm'],
+['Hebreos','heb','he'],['Santiago','sant','stg'],['1 Pedro','1 ped','1 pe','1 p'],['2 Pedro','2 ped','2 pe','2 p'],['1 Juan','1 jn'],['2 Juan','2 jn'],['3 Juan','3 jn'],['Judas','jud'],['Apocalipsis','apoc','ap']
+];
+function accentPat(s){return s.replace(/[aeioun]/g,c=>({a:'[aá]',e:'[eé]',i:'[ií]',o:'[oó]',u:'[uúü]',n:'[nñ]'})[c]);}
+function aliasPattern(a){
+  const m=a.match(/^([123])\s+(.+)$/);
+  let pre='',rest=a;
+  if(m){ pre=m[1]+'\\s*\\.?\\s*[ºª]?\\s*'; rest=m[2]; }
+  return pre+rest.split(' ').map(accentPat).join('\\s+');
+}
+const bibleMap=new Map();
+const bibleRe=(()=>{
+  const pats=new Set();
+  for(const b of BOOKS){
+    for(const a of [b[0].toLowerCase(),...b.slice(1)]){
+      bibleMap.set(normKey(a),b[0]);
+      pats.add(aliasPattern(normPlain(a)));
+    }
+  }
+  const alt=[...pats].sort((x,y)=>y.length-x.length).join('|');
+  const num='\\d{1,3}';
+  const body='('+num+'(?:\\s*:\\s*|\\.)'+num+'(?:\\s*[-–—]\\s*'+num+')?(?:\\s*,\\s*'+num+'(?:\\s*[-–—]\\s*'+num+')?(?!\\s*:)(?!\\d)(?!\\s+\\p{L}{2,}\\.?\\s*\\d))*|'+num+')';
+  return new RegExp('(?<![\\p{L}\\p{N}])('+alt+')\\.?\\s*'+body+'(?![\\p{N}])','giu');
+})();
+function findRefs(text){
+  const out=[];
+  for(const m of text.matchAll(bibleRe)){
+    const canon=bibleMap.get(normKey(m[1]));
+    if(!canon) continue;
+    const rest=m[2].replace(/\s+/g,'').replace(/[–—]/g,'-').replace(/^(\d+)\.(\d+)/,'$1:$2');
+    if(rest.indexOf(':')<0 && canon!=='Salmos') continue;
+    out.push({start:m.index,end:m.index+m[0].length,text:m[0],canon,rest});
+  }
+  return out;
+}
+const bibleUrl=(f,ver)=>'https://www.biblegateway.com/passage/?search='+encodeURIComponent(f.canon+' '+f.rest)+'&version='+encodeURIComponent(ver);
+function spokenRef(f,lang){
+  const es=lang!=='en'&&lang!=='pt';
+  let book=f.canon;
+  if(es) book=book.replace(/^1 /,'Primera de ').replace(/^2 /,'Segunda de ').replace(/^3 /,'Tercera de ');
+  const mm=f.rest.match(/^(\d+)(?::(.*))?$/);
+  if(!mm) return f.text;
+  const ch=mm[1],vs=mm[2];
+  const W=lang==='pt'?{c:'capítulo',v:'versículo',vs:'versículos',to:'ao'}:es?{c:'capítulo',v:'versículo',vs:'versículos',to:'al'}:{c:'chapter',v:'verse',vs:'verses',to:'to'};
+  if(vs==null) return book+' '+W.c+' '+ch;
+  const multi=/[-,]/.test(vs);
+  return book+' '+W.c+' '+ch+', '+(multi?W.vs:W.v)+' '+vs.replace(/(\d+)-(\d+)/g,'$1 '+W.to+' $2').replace(/,/g,', ');
+}
+function speechText(s,bibleOn,lang){
+  let out=s;
+  if(bibleOn){
+    let r='',last=0;
+    for(const f of findRefs(s)){ r+=s.slice(last,f.start)+spokenRef(f,lang); last=f.end; }
+    out=r+s.slice(last);
+  }
+  return out.replace(/https?:\/\/\S+/g,' enlace ').replace(/[*_#`~|<>{}\[\]]/g,' ').replace(/\s+/g,' ').trim();
+}
+
+/* DOCX sin librerías: ZIP + deflate-raw */
+async function docxToText(buf){
+  const u8=new Uint8Array(buf),dv=new DataView(u8.buffer,u8.byteOffset,u8.byteLength);
+  let i=u8.length-22;
+  while(i>=0 && dv.getUint32(i,true)!==0x06054b50) i--;
+  if(i<0) throw new Error('zip');
+  const count=dv.getUint16(i+10,true); let p=dv.getUint32(i+16,true),entry=null;
+  for(let k=0;k<count;k++){
+    if(dv.getUint32(p,true)!==0x02014b50) break;
+    const method=dv.getUint16(p+10,true),csize=dv.getUint32(p+20,true),nlen=dv.getUint16(p+28,true),elen=dv.getUint16(p+30,true),clen=dv.getUint16(p+32,true),loff=dv.getUint32(p+42,true);
+    const name=new TextDecoder().decode(u8.subarray(p+46,p+46+nlen));
+    if(name==='word/document.xml') entry={method,csize,loff};
+    p+=46+nlen+elen+clen;
+  }
+  if(!entry) throw new Error('nodoc');
+  const start=entry.loff+30+dv.getUint16(entry.loff+26,true)+dv.getUint16(entry.loff+28,true);
+  const data=u8.subarray(start,start+entry.csize);
+  let xmlBytes=data;
+  if(entry.method!==0){
+    const stream=new Blob([data]).stream().pipeThrough(new DecompressionStream('deflate-raw'));
+    xmlBytes=new Uint8Array(await new Response(stream).arrayBuffer());
+  }
+  const xml=new TextDecoder('utf-8').decode(xmlBytes);
+  const dec=s=>s.replace(/&#x([0-9a-f]+);/gi,(_,h)=>String.fromCodePoint(parseInt(h,16))).replace(/&#(\d+);/g,(_,d)=>String.fromCodePoint(+d)).replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&quot;/g,'"').replace(/&apos;/g,"'").replace(/&amp;/g,'&');
+  const paras=[];
+  for(const pm of xml.matchAll(/<w:p[\s>][\s\S]*?<\/w:p>/g)){
+    let t='';
+    for(const tm of pm[0].matchAll(/<w:t(?:\s[^>]*)?>([\s\S]*?)<\/w:t>|<w:tab\s*\/>|<w:br\s*\/>/g)) t+=tm[1]!==undefined?dec(tm[1]):' ';
+    t=t.replace(/\s+/g,' ').trim();
+    if(t) paras.push(t);
+  }
+  return paras.join('\n\n');
+}
+/* Teleprompter: palabras, similitud y seguimiento de la voz */
+const normWord=w=>normPlain(String(w).toLowerCase()).replace(/[^a-z0-9]/g,'');
+const speechTokens=t=>String(t).split(/\s+/).map(normWord).filter(Boolean);
+function lev(a,b){
+  const m=a.length,n=b.length; if(!m)return n; if(!n)return m;
+  let prev=new Array(n+1),cur=new Array(n+1);
+  for(let j=0;j<=n;j++)prev[j]=j;
+  for(let i=1;i<=m;i++){
+    cur[0]=i;
+    for(let j=1;j<=n;j++)cur[j]=Math.min(prev[j]+1,cur[j-1]+1,prev[j-1]+(a[i-1]===b[j-1]?0:1));
+    [prev,cur]=[cur,prev];
+  }
+  return prev[n];
+}
+function wordSim(a,b){
+  if(a===b)return 1;
+  if(!a||!b||Math.min(a.length,b.length)<=2)return 0;
+  if(a.length>=4&&b.length>=4&&(a.startsWith(b)||b.startsWith(a))&&Math.abs(a.length-b.length)<=3)return 0.85;
+  return 1-lev(a,b)/Math.max(a.length,b.length);
+}
+/* words: arreglo de palabras normalizadas del guion (puede crecer). feed() devuelve, por cada palabra oída, 1 si hizo avanzar el guion. */
+function makeFollower(words,start){
+  const F={i:start||0,pend:null,W:12,words};
+  F.step=function(h){
+    const n=F.words.length;let best=-1,bs=0;
+    for(let j=F.i;j<Math.min(n,F.i+F.W);j++){const s=wordSim(h,F.words[j]);if(s>=0.72){best=j;bs=s;break;}}
+    if(best<0){F.pend=null;return 0;}
+    if(best-F.i<=1){F.i=best+1;F.pend=null;return 1;}
+    const p=F.pend;
+    if(p&&best===p.j+1){
+      p.j=best;p.len++;p.long=p.long||h.length>=4;
+      if((p.len>=2&&p.long)||p.len>=3){F.i=best+1;F.pend=null;return 1;}
+      return 0;
+    }
+    F.pend={j:best,len:1,long:h.length>=4};
+    if(h.length>=7&&bs>=0.9){F.i=best+1;F.pend=null;return 1;}
+    return 0;
+  };
+  F.feed=function(tokens){return tokens.map(h=>F.step(h));};
+  return F;
+}
+
+/* Resaltados: cortes de una frase según citas bíblicas y resaltados */
+function segmentsFor(t,refs,hls){
+  const cuts=new Set([0,t.length]);
+  refs.forEach(f=>{cuts.add(f.start);cuts.add(f.end);});
+  hls.forEach(h=>{cuts.add(Math.max(0,h.a));cuts.add(Math.min(t.length,h.b));});
+  const pts=[...cuts].sort((x,y)=>x-y),segs=[];
+  for(let k=0;k<pts.length-1;k++){
+    const a=pts[k],b=pts[k+1];if(b<=a)continue;
+    const ref=refs.find(f=>a>=f.start&&b<=f.end)||null;
+    let c=null;for(let q=hls.length-1;q>=0;q--){if(a>=hls[q].a&&b<=hls[q].b){c=hls[q].c;break;}}
+    segs.push({a,b,ref,c});
+  }
+  return segs;
+}
+/* Aplica (o borra con c='x') un resaltado [a,b) sobre los de una misma frase. */
+function mergeHl(list,t,a,b,c){
+  const out=[];
+  for(const h of list){
+    if(h.t!==t||h.b<=a||h.a>=b){out.push(h);continue;}
+    if(h.a<a)out.push({t,a:h.a,b:a,c:h.c});
+    if(h.b>b)out.push({t,a:b,b:h.b,c:h.c});
+  }
+  if(c!=='x'&&b>a)out.push({t,a,b,c});
+  return out;
+}
+/*CORE-END*/
+
+/* Detección del idioma de un texto por palabras frecuentes propias de cada idioma */
+const LANG_WORDS=(()=>{
+  const raw={
+    es:'el la los las un una unos unas del al que se por para con sin sobre entre como pero porque cuando donde quien cual muy más menos también ya así aquí allí está están eres soy fue fueron sido ser tiene tienen hay nos les mi tu su sus este esta estos estas ese esa eso lo le y o no sí hasta desde durante según después antes todo todos nada algo mismo otro otra',
+    en:'the of and to in is that for it as was with be by on not he she this are or his her from at which but have an had they you were their one all we can has there been if more when will would who so what about into than them only other its our out up do does did just also because these those how our your my me him them us',
+    pt:'o a os as um uma uns umas do da dos das no na nos nas ao aos à às que se por para com sem sobre entre como mas porque quando onde quem qual muito mais menos também já assim aqui ali está estão sou fui foram sido ser tem têm há nós lhe lhes meu minha seu sua seus suas este esta estes estas esse essa isso isto não sim até desde durante segundo depois antes tudo todos nada algo mesmo outro outra você vocês ele ela eles elas pelo pela pelos pelas num numa'
+  };
+  const sets={};for(const k in raw)sets[k]=new Set(raw[k].split(/\s+/));
+  const count={};for(const k in sets)for(const w of sets[k])count[w]=(count[w]||0)+1;
+  const uniq={};for(const k in sets)uniq[k]=new Set([...sets[k]].filter(w=>count[w]===1));
+  return uniq;
+})();
+function detectLang(text){
+  const words=(text||'').slice(0,6000).toLowerCase().match(/[\p{L}]+/gu)||[];
+  if(words.length<12)return null;
+  const sc={es:0,en:0,pt:0};
+  for(const w of words)for(const k in sc)if(LANG_WORDS[k].has(w))sc[k]++;
+  const arr=Object.entries(sc).sort((a,b)=>b[1]-a[1]);
+  if(arr[0][1]<4||arr[0][1]<arr[1][1]*1.25)return null;
+  return arr[0][0];
+}
+
+function bibleSearchUrl(sel,ver){
+  const s=String(sel||'').replace(/\s+/g,' ').trim(),refs=findRefs(s);
+  const q=refs.length?refs[0].canon+' '+refs[0].rest:s;
+  return 'https://www.biblegateway.com/passage/?search='+encodeURIComponent(q)+'&version='+encodeURIComponent(ver||'RVR1960');
+}
+
+/* Puntuación del texto dictado: comandos hablados + puntos y mayúsculas automáticos */
+const SPOKEN={
+  es:[[/\bpunto y aparte\b/gi,'.\n\n'],[/\bpunto y coma\b/gi,';'],[/\bdos puntos\b/gi,':'],[/\bpuntos suspensivos\b/gi,'…'],[/\bpunto final\b/gi,'.'],[/\bpunto seguido\b/gi,'.'],
+      [/\babrir interrogaci[oó]n\b/gi,'¿'],[/\b(?:cerrar interrogaci[oó]n|signo de interrogaci[oó]n|interrogaci[oó]n)\b/gi,'?'],[/\babrir admiraci[oó]n\b/gi,'¡'],[/\b(?:cerrar admiraci[oó]n|signo de admiraci[oó]n|admiraci[oó]n)\b/gi,'!'],
+      [/\babrir par[eé]ntesis\b/gi,'('],[/\bcerrar par[eé]ntesis\b/gi,')'],[/\b(?:nueva l[ií]nea|siguiente l[ií]nea|salto de l[ií]nea)\b/gi,'\n'],[/\bnuevo p[aá]rrafo\b/gi,'\n\n'],[/\bcomillas\b/gi,'"'],[/\bcoma\b/gi,',']],
+  en:[[/\bnew paragraph\b/gi,'\n\n'],[/\b(?:new line|next line)\b/gi,'\n'],[/\bsemicolon\b/gi,';'],[/\bcolon\b/gi,':'],[/\bellipsis\b/gi,'…'],[/\bquestion mark\b/gi,'?'],[/\bexclamation (?:mark|point)\b/gi,'!'],[/\b(?:full stop|period)\b/gi,'.'],[/\bopen parenthesis\b/gi,'('],[/\bclose parenthesis\b/gi,')'],[/\bcomma\b/gi,',']],
+  pt:[[/\bnovo par[aá]grafo\b/gi,'\n\n'],[/\b(?:nova linha|pr[oó]xima linha)\b/gi,'\n'],[/\bponto e v[ií]rgula\b/gi,';'],[/\bdois pontos\b/gi,':'],[/\breticências\b/gi,'…'],[/\bponto de interrogação\b/gi,'?'],[/\bponto de exclamação\b/gi,'!'],[/\b(?:ponto final|ponto parágrafo)\b/gi,'.'],[/\babrir par[eê]nteses\b/gi,'('],[/\bfechar par[eê]nteses\b/gi,')'],[/\bv[ií]rgula\b/gi,',']]
+};
+const ES_DET=new Set('el la los las un una unos unas este esta estos estas ese esa esos esas aquel aquella otro otra mi mis tu tus su sus del al ningún algún primer segundo tercer último mismo cada todo todos buen mal mejor peor ese'.split(' '));
+const ES_Q=/^(?:qué|cómo|cuándo|cuánto|cuánta|cuántos|cuántas|dónde|adónde|quién|quiénes|cuál|cuáles|por qué|para qué|de dónde|a dónde|en qué|con qué|de qué)(?![\p{L}])/iu;
+function punctuate(text,o){
+  o=o||{};const lang=o.lang||'es',auto=o.auto!==false,prev=o.prev||'';
+  let s=' '+String(text||'').replace(/[ \t]+/g,' ')+' ';
+  for(const [re,sym] of (SPOKEN[lang]||SPOKEN.es))s=s.replace(re,' '+sym+' ');
+  if(lang==='es'||lang==='pt'){
+    const w=s.split(' ');
+    for(let i=0;i<w.length;i++){
+      const lw=w[i].toLowerCase();
+      if(lw==='punto'&&!ES_DET.has((w[i-1]||'').toLowerCase())&&!/^(de|medio|débil|fuerte|clave|crítico|crucial|final)$/i.test(w[i+1]||'')&&(lang!=='pt'||true))w[i]='.';
+    }
+    s=w.join(' ');
+  }
+  s=s.replace(/\s+([,.;:?!…)\]])/g,'$1').replace(/([(¿¡])\s+/g,'$1').replace(/[ ]*\n[ ]*/g,'\n').replace(/"\s+([^"]*?)\s+"/g,'"$1"');
+  s=s.replace(/([,.;:?!…])(?=[\p{L}\p{N}¿¡(])/gu,'$1 ').replace(/[ ]{2,}/g,' ').replace(/(\d)\s*:\s*(\d)/g,'$1:$2').replace(/^\s+|[ ]+$/g,'');
+  const startCap=!prev||/[.?!…\n]\s*$/.test(prev);
+  const lines=s.split('\n');
+  const out=lines.map((line,li)=>{
+    if(!line.trim())return line;
+    let l=line;
+    if(auto&&!/[.?!…:;,)"]\s*$/.test(l)&&(li<lines.length-1||o.final!==false)){
+      const tail=(l.match(/(?:^|[.!?…]\s+)([^.!?…]*)$/)||[0,l])[1];
+      l=l+((lang==='es'&&ES_Q.test(tail.replace(/^[¿¡]+/,'')))?'?':'.');
+    }
+    if(lang==='es'){
+      l=l.replace(/(^|[.!?…]\s+)([^.!?…¿¡]*?\?)/g,(m,a,b)=>/^\s*¿/.test(b)?m:a+'¿'+b);
+    }
+    if(auto){
+      if(li>0||startCap)l=l.replace(/^([¿¡"(]*)(\p{Ll})/u,(m,a,b)=>a+b.toUpperCase());
+      l=l.replace(/([.?!…]\s+)([¿¡"(]*)(\p{Ll})/gu,(m,a,b,c)=>a+b+c.toUpperCase());
+    }
+    return l;
+  });
+  return out.join('\n');
+}
+
+const $=(s,r=document)=>r.querySelector(s);
+const $$=(s,r=document)=>[...r.querySelectorAll(s)];
+function el(tag,cls,text){const e=document.createElement(tag);if(cls)e.className=cls;if(text!=null)e.textContent=text;return e;}
+
+/* Iconos */
+const PATHS={
+  play:['f','<path d="M8 5v14l11-7z"/>'],
+  pause:['f','<rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/>'],
+  stop:['f','<rect x="6" y="6" width="12" height="12" rx="2"/>'],
+  prev:['s','<path d="M15 18l-6-6 6-6"/>'],
+  next:['s','<path d="M9 18l6-6-6-6"/>'],
+  prevPage:['s','<path d="M11 17l-5-5 5-5M18 17l-5-5 5-5"/>'],
+  nextPage:['s','<path d="M13 17l5-5-5-5M6 17l5-5-5-5"/>'],
+  back:['s','<path d="M19 12H5M12 19l-7-7 7-7"/>'],
+  plus:['s','<path d="M12 5v14M5 12h14"/>'],
+  sliders:['s','<path d="M3 6h11M20 6h1M3 12h5M14 12h7M3 18h14M21 18h0"/><circle cx="17" cy="6" r="2.2"/><circle cx="11" cy="12" r="2.2"/><circle cx="19" cy="18" r="2.2"/>'],
+  search:['s','<circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/>'],
+  book:['s','<path d="M12 6c-1.5-1.5-4-2-7-2v14c3 0 5.5.5 7 2 1.5-1.5 4-2 7-2V4c-3 0-5.5.5-7 2zM12 6v14"/>'],
+  dots:['f','<circle cx="5" cy="12" r="1.7"/><circle cx="12" cy="12" r="1.7"/><circle cx="19" cy="12" r="1.7"/>'],
+  trash:['s','<path d="M4 7h16M10 11v6M14 11v6M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12M9 7V4h6v3"/>'],
+  copy:['s','<rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h8"/>'],
+  grip:['f','<circle cx="9" cy="6" r="1.6"/><circle cx="15" cy="6" r="1.6"/><circle cx="9" cy="12" r="1.6"/><circle cx="15" cy="12" r="1.6"/><circle cx="9" cy="18" r="1.6"/><circle cx="15" cy="18" r="1.6"/>'],
+  trash:['s','<path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/>'],
+  save:['s','<path d="M5 4h11l3 3v13H5z"/><path d="M8 4v5h7V4M8 20v-6h8v6"/>'],
+  help:['s','<circle cx="12" cy="12" r="9"/><path d="M9.6 9.4a2.5 2.5 0 1 1 3.6 2.2c-.8.5-1.2 1-1.2 1.9M12 17h.01"/>'],
+  pencil:['s','<path d="M4 20h4L19 9l-4-4L4 16zM13.5 6.5l4 4"/>'],
+  x:['s','<path d="M6 6l12 12M18 6L6 18"/>'],
+  vol:['s','<path d="M4 9v6h4l5 4V5L8 9zM16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12"/>'],
+  upload:['s','<path d="M12 16V4M7 9l5-5 5 5M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3"/>'],
+  open:['s','<path d="M5 4h9l5 5v11H5zM14 4v5h5"/>'],
+  hl:['s','<path d="M15 4l5 5-9 9H6v-5zM4 21h8"/>'],
+  tele:['s','<rect x="3" y="4" width="18" height="12" rx="2"/><path d="M7 8h10M7 12h6M9 20h6M12 16v4"/>'],
+  check:['s','<path d="M5 12l5 5 10-11"/>'],
+  chevDown:['s','<path d="M6 9l6 6 6-6"/>'],
+  chevUp:['s','<path d="M6 15l6-6 6 6"/>'],
+  minus:['s','<path d="M5 12h14"/>'],
+  mic:['s','<rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/>'],
+  dot:['f','<circle cx="12" cy="12" r="6"/>']
+};
+function ic(name,size){const p=PATHS[name];return '<svg class="ic'+(p[0]==='f'?' f':'')+'" viewBox="0 0 24 24" aria-hidden="true"'+(size?' style="width:'+size+'px;height:'+size+'px"':'')+'>'+p[1]+'</svg>';}
+function setIc(sel,name,size){const n=$(sel);if(n)n.innerHTML=ic(name,size);}
+
+/* Ajustes */
+const BIBLES=[['RVR1960','Reina-Valera 1960'],['NBLA','Nueva Biblia de las Américas'],['NVI','Nueva Versión Internacional'],['NTV','Nueva Traducción Viviente'],['LBLA','La Biblia de las Américas'],['DHH','Dios Habla Hoy'],['RVA-2015','Reina-Valera Actualizada']];
+const TPDEF={mode:'voz',wpm:130,fs:38,w:46,al:'left',scheme:'dark',mirror:false,dim:true,count:true,wake:true,h:100,anchor:'top',op:100,band:35};
+const ST={lang:'es',voice:{es:'',en:''},vol:1,rate:1,bible:'RVR1960',bibleOn:true,fs:19,wake:false,dockMin:false,editCopy:false,autoSave:true,tp:{}};
+try{Object.assign(ST,JSON.parse(localStorage.getItem('leo.settings')||'{}'));}catch(e){}
+ST.voice=Object.assign({es:'',en:'',pt:''},ST.voice||{});
+if(!['es','en','pt','auto'].includes(ST.langMode))ST.langMode=(ST.lang==='en'||ST.lang==='pt')?ST.lang:'es';
+ST.lang=ST.langMode==='auto'?'es':ST.langMode;
+ST.tp=Object.assign({},TPDEF,ST.tp||{});
+function saveSettings(){try{localStorage.setItem('leo.settings',JSON.stringify(ST));}catch(e){}}
+
+/* Almacenamiento (IndexedDB con respaldo en memoria) */
+const store={
+  ok:false,db:null,mem:{books:new Map(),texts:new Map(),recs:new Map(),meta:new Map()},
+  async init(){
+    try{
+      this.db=await new Promise((res,rej)=>{
+        const r=indexedDB.open('leo-por-ti',3);
+        r.onupgradeneeded=()=>{const d=r.result;for(const n of ['books','texts','recs','meta'])if(!d.objectStoreNames.contains(n))d.createObjectStore(n,{keyPath:'id'});};
+        r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error);r.onblocked=()=>rej(new Error('blocked'));
+      });
+      this.ok=true;
+    }catch(e){this.ok=false;}
+  },
+  req(r){return new Promise((res,rej)=>{r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error);});},
+  os(n,m){return this.db.transaction(n,m).objectStore(n);},
+  async all(n){n=n||'books';return this.ok?this.req(this.os(n,'readonly').getAll()):[...this.mem[n].values()];},
+  async delOne(n,id){if(n!=='meta'){A.dirty=true;updateSaveBtn();}if(!this.ok){this.mem[n].delete(id);return;}return this.req(this.os(n,'readwrite').delete(id));},
+  async get(n,id){return this.ok?this.req(this.os(n,'readonly').get(id)):this.mem[n].get(id);},
+  async put(n,o){if(n!=='meta'){A.dirty=true;updateSaveBtn();}if(!this.ok){this.mem[n].set(o.id,o);return;}return this.req(this.os(n,'readwrite').put(o));},
+  async del(id){A.dirty=true;if(!this.ok){this.mem.books.delete(id);this.mem.texts.delete(id);return;}await this.req(this.os('books','readwrite').delete(id));await this.req(this.os('texts','readwrite').delete(id));}
+};
+
+/* Estado */
+const A={books:[],cur:null,R:null,pages:null,pos:0,page:0,view:'lib',playing:false,started:false,finished:false,token:0,lastAct:0,voices:[],wl:null,keep:null,utt:null,saveT:null,editId:null,pendingSource:null,tap:{el:null,t:0},editing:false,hlOn:false,hlMap:new Map(),lastSel:null,downloads:null,recs:[],libTab:'books',bookKind:'all'};
+
+let toastT=null;
+function toastAct(msg,label,fn,ms){
+  const t=$('#toast');clearTimeout(toastT);t.replaceChildren(el('span',null,msg+' '));
+  const b=el('button','toast-act',label);b.type='button';b.addEventListener('click',()=>{t.hidden=true;fn();});t.append(b);t.hidden=false;
+  toastT=setTimeout(()=>{t.hidden=true;},ms||5000);
+}
+function toast(msg,ms){const t=$('#toast');t.textContent=msg;t.hidden=false;clearTimeout(toastT);toastT=setTimeout(()=>{t.hidden=true;},ms||3400);}
+function busy(msg,frac){const b=$('#busy');b.hidden=false;$('#busyMsg').textContent=msg;$('#busyBar').style.width=Math.round((frac||0)*100)+'%';}
+function unbusy(){$('#busy').hidden=true;}
+
+/* Hojas */
+function openSheet(id){closeSheets();$(id).hidden=false;}
+function closeSheets(){
+  if(typeof onSheetClose==='function')onSheetClose();
+  $$('.veil').forEach(v=>{v.hidden=true;});
+}
+
+/* Libros */
+const PALETTE=[['#0B5D63','#12333A'],['#3B3F9E','#1E2155'],['#8A2F3C','#4A1620'],['#2F6B3F','#173823'],['#455468','#232C38'],['#9A6A12','#573A08'],['#6B3A7D','#361C40'],['#1F4E8C','#0F2A4D']];
+function hash(s){let h=0;for(let i=0;i<s.length;i++)h=(h*31+s.charCodeAt(i))>>>0;return h;}
+function pageOfPos(b){const st=b.pageStarts||[0];let p=0;while(p+1<st.length&&st[p+1]<=b.pos)p++;return p;}
+function pctOf(b){return b.total>1?Math.round(100*b.pos/(b.total-1)):0;}
+const KIND={pdf:'PDF',docx:'DOCX',txt:'TXT',texto:'TEXTO'};
+function newId(){return 'b'+Date.now().toString(36)+Math.random().toString(36).slice(2,6);}
+async function createBook({title,kind,pages,cover,source}){
+  const idx=buildIndex(pages);
+  const meta={id:newId(),title:title||'Sin título',kind,source:source||'',pageCount:pages.length,total:idx.sents.length,pageStarts:idx.pageStarts,chars:idx.cum[idx.cum.length-1],pos:0,cover:cover||null,addedAt:Date.now(),openedAt:0};
+  await store.put('texts',{id:meta.id,pages});
+  await store.put('books',meta);
+  A.books.push(meta);
+  return meta;
+}
+function scheduleSave(){clearTimeout(A.saveT);A.saveT=setTimeout(saveNow,700);}
+function saveNow(){clearTimeout(A.saveT);if(A.cur){const was=A.dirty;store.put('books',A.cur).catch(()=>{});A.dirty=was;updateSaveBtn();}}
+
+/* Biblioteca */
+function coverInner(b){
+  const f=document.createDocumentFragment();
+  if(b.cover){const i=el('img');i.src=b.cover;i.alt='';f.append(i);}
+  else{
+    const c=PALETTE[hash(b.title)%PALETTE.length];
+    const d=el('div','cover-ph');d.style.setProperty('--c1',c[0]);d.style.setProperty('--c2',c[1]);
+    d.append(el('b',null,b.title),el('small',null,'LeamosTxTs'));f.append(d);
+  }
+  f.append(el('span','kind',KIND[b.kind]||'TEXTO'));
+  return f;
+}
+function closeMenus(){$$('.menu').forEach(m=>m.remove());}
+function openMenu(b,wrap){
+  const had=$('.menu',wrap);closeMenus();if(had)return;
+  const m=el('div','menu');
+  const mk=(icon,label,fn,cls)=>{const x=el('button',cls);x.type='button';x.innerHTML=ic(icon,18)+'<span>'+label+'</span>';x.addEventListener('click',e=>{e.stopPropagation();fn(x);});return x;};
+  m.append(mk('open','Abrir',()=>{closeMenus();openBook(b.id);}));
+  m.append(mk('pencil','Editar',()=>{closeMenus();openEdit(b);}));
+  m.append(mk('upload','Exportar .txt',()=>{closeMenus();exportBookTxt(b);}));
+  m.append(mk('trash','Eliminar',x=>{
+    const c=el('div','confirm');c.append(el('span',null,'¿Eliminar?'));
+    const y=el('button','btn sm danger','Sí');y.type='button';y.addEventListener('click',e=>{e.stopPropagation();deleteBook(b.id);});
+    const n=el('button','btn sm','No');n.type='button';n.addEventListener('click',e=>{e.stopPropagation();closeMenus();});
+    c.append(y,n);x.replaceWith(c);
+  }));
+  wrap.append(m);
+}
+function cardEl(b){
+  const art=el('article','card'),wrap=el('div','cover-wrap');
+  const cover=el('button','cover');cover.type='button';cover.setAttribute('aria-label','Abrir '+b.title);
+  cover.append(coverInner(b));cover.addEventListener('click',()=>openBook(b.id));
+  const more=el('button','more');more.type='button';more.innerHTML=ic('dots',18);more.setAttribute('aria-label','Opciones de '+b.title);
+  more.addEventListener('click',e=>{e.stopPropagation();openMenu(b,wrap);});
+  wrap.append(cover,more);
+  const p=pctOf(b);
+  const bar=el('div','bar');const i=el('i');i.style.width=p+'%';bar.append(i);
+  art.append(wrap,el('div','card-title',b.title),el('div','card-meta','Pág. '+(pageOfPos(b)+1)+' de '+b.pageCount+' · '+p+' %'),bar);
+  return art;
+}
+function renderLib(){
+  const q=$('#q').value.trim().toLowerCase();
+  const recsTab=A.libTab==='recs';
+  $$('#libTabs button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.t===A.libTab)));
+  $('#grid').hidden=recsTab;$('#recWrap').hidden=!recsTab;$('#kindChips').hidden=recsTab;
+  $('.lib-title').firstChild.textContent=recsTab?'Textos grabados':'Tus libros';
+  $('#q').placeholder=recsTab?'Buscar en los textos grabados':'Buscar por título';
+  if(recsTab){
+    renderRecs();$('#empty').hidden=true;
+    $('#libCount').textContent=A.recs.length?A.recs.length+(A.recs.length===1?' texto':' textos'):'';
+    renderMini();return;
+  }
+  const grp=k=>k==='pdf'?'pdf':k==='docx'?'docx':'txt';
+  const cnt={all:A.books.length,pdf:0,docx:0,txt:0};A.books.forEach(b=>cnt[grp(b.kind)]++);
+  $$('#kindChips button').forEach(b=>{const k=b.dataset.k;b.setAttribute('aria-pressed',String(k===A.bookKind));b.querySelector('i').textContent=cnt[k];});
+  const list=A.books.filter(b=>(A.bookKind==='all'||grp(b.kind)===A.bookKind)&&(!q||b.title.toLowerCase().includes(q))).sort((a,b)=>(b.openedAt||b.addedAt)-(a.openedAt||a.addedAt));
+  $('#grid').replaceChildren(...list.map(cardEl));
+  $('#empty').hidden=list.length>0;
+  const eh=$('#empty h2'),ep=$('#empty p');
+  if(A.books.length&&!list.length){eh.textContent='Sin resultados';ep.textContent='No hay libros en este grupo o con esa búsqueda.';$('#emptyAdd').hidden=true;}
+  else{eh.textContent='Aquí aparecerán tus libros';ep.textContent='Arrastra un PDF, un Word o un TXT, o pega texto copiado. Quedará guardado con tu avance.';$('#emptyAdd').hidden=false;}
+  $('#libCount').textContent=A.books.length?A.books.length+(A.books.length===1?' libro':' libros'):'';
+  renderMini();
+}
+async function deleteBook(id){
+  if(A.cur&&A.cur.id===id){pause();A.cur=null;A.R=null;A.started=false;}
+  await store.del(id);A.books=A.books.filter(b=>b.id!==id);closeMenus();renderLib();toast('Libro eliminado');
+}
+
+/* Edición */
+const BRK='\n\n⁂ salto de página ⁂\n\n';
+async function openEdit(b){
+  const t=await store.get('texts',b.id);if(!t){toast('No encontré el texto de este libro.');return;}
+  A.editId=b.id;$('#edTitle').value=b.title;$('#edText').value=t.pages.join(BRK);openSheet('#shEdit');
+}
+async function saveEdit(){
+  const meta=A.books.find(x=>x.id===A.editId);if(!meta)return;
+  const raw=$('#edText').value;
+  const pages=raw.split(/\s*⁂ salto de página ⁂\s*/).map(p=>textToParas(p).join('\n\n'));
+  if(pages.every(p=>!p)){toast('El texto no puede quedar vacío.');return;}
+  const wasCur=A.cur&&A.cur.id===meta.id;if(wasCur)pause();
+  const idx=buildIndex(pages);
+  meta.title=$('#edTitle').value.trim()||meta.title;meta.pageCount=pages.length;meta.total=idx.sents.length;meta.pageStarts=idx.pageStarts;meta.chars=idx.cum[idx.cum.length-1];
+  meta.pos=Math.min(meta.pos,Math.max(0,meta.total-1));
+  await store.put('texts',{id:meta.id,pages});await store.put('books',meta);
+  if(wasCur){A.pages=pages;A.R=idx;A.cur=meta;rebuildHlMap();if(A.view==='read')setupReader();}
+  closeSheets();renderLib();toast('Cambios guardados');
+}
+
+/* Lector */
+function rebuildHlMap(){
+  A.hlMap=new Map();
+  for(const h of (A.cur&&A.cur.hls)||[]){if(!A.hlMap.has(h.t))A.hlMap.set(h.t,[]);A.hlMap.get(h.t).push(h);}
+}
+function fillSentence(sp,t){
+  const refs=ST.bibleOn?findRefs(t):[];
+  const hls=(A.hlMap&&A.hlMap.get(t))||[];
+  if(!refs.length&&!hls.length){sp.textContent=t;return;}
+  for(const s of segmentsFor(t,refs,hls)){
+    let node=document.createTextNode(t.slice(s.a,s.b));
+    if(s.c){const m=el('mark','hl hl-'+s.c);m.append(node);node=m;}
+    if(s.ref){
+      const f=s.ref,a=el('a','ref');a.href=bibleUrl(f,ST.bible);a.target='_blank';a.rel='noopener noreferrer';
+      a.title='Abrir '+f.canon+' '+f.rest+' en BibleGateway ('+ST.bible+')';a.append(node);node=a;
+    }
+    sp.append(node);
+  }
+}
+function renderPage(p){
+  A.page=p;const box=$('#text');box.replaceChildren();box.lang=ST.lang;
+  const pp=A.R.paraMap[p]||[];
+  if(!pp.length)box.append(el('div','nopage','Esta página no tiene texto.'));
+  for(const idxs of pp){
+    const par=el('p');
+    idxs.forEach((i,k)=>{const sp=el('span','sent');sp.dataset.i=i;fillSentence(sp,A.R.sents[i].t);par.append(sp);if(k<idxs.length-1)par.append(' ');});
+    box.append(par);
+  }
+  $('#pgInput').value=p+1;
+  markNow(A.pos,false);
+}
+function ensureVisible(n){
+  const r=n.getBoundingClientRect();
+  const top=$('.top').offsetHeight+24,bot=innerHeight-(parseInt(getComputedStyle(document.documentElement).getPropertyValue('--dock-h'))||0)-24;
+  if(r.top<top||r.bottom>bot){
+    const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+    scrollTo({top:scrollY+r.top-innerHeight*0.3,behavior:reduce?'auto':'smooth'});
+  }
+}
+function goToSentence(i){
+  closeSheets();if(A.playing)speak(i);else setPos(i,{scroll:false});
+  requestAnimationFrame(()=>{
+    const n=$('.sent[data-i="'+i+'"]');if(!n)return;
+    n.scrollIntoView({block:'center',behavior:'auto'});
+    n.classList.add('flash');setTimeout(()=>n.classList.remove('flash'),2600);
+  });
+}
+function markNow(i,scroll){
+  const old=$('.sent.now');if(old)old.classList.remove('now');
+  const n=$('.sent[data-i="'+i+'"]');
+  if(n){n.classList.add('now');if(scroll)ensureVisible(n);}
+}
+function fmtEta(chars){
+  const m=Math.round(chars/(950*ST.rate));
+  if(m<1)return 'menos de 1 min';
+  return m>=60?'≈ '+Math.floor(m/60)+' h '+(m%60)+' min':'≈ '+m+' min';
+}
+function updateSeek(i){
+  const R=A.R,n=R.sents.length,pos=i==null?A.pos:i;
+  const seek=$('#seek');seek.max=Math.max(0,n-1);if(i==null)seek.value=pos;
+  seek.style.setProperty('--p',(n>1?100*pos/(n-1):0)+'%');
+  const pg=n?R.sents[pos].p:0;
+  $('#seekPage').textContent='Pág. '+(pg+1)+' de '+A.cur.pageCount;
+  $('#seekPct').textContent=(n>1?Math.round(100*pos/(n-1)):0)+' %';
+  $('#seekEta').textContent=fmtEta(R.cum[n]-R.cum[pos]);
+  if(i==null)$('#pgInput').value=A.page+1;
+}
+function setPos(i,o){
+  o=o||{};const R=A.R;if(!R||!R.sents.length)return;
+  i=Math.max(0,Math.min(R.sents.length-1,i));A.pos=i;A.cur.pos=i;
+  const p=R.sents[i].p;
+  if(!o.keepPage&&p!==A.page&&A.view==='read'){scrollTo(0,0);renderPage(p);}
+  markNow(i,o.scroll);updateSeek();scheduleSave();mediaMeta();renderMini();
+}
+function setupReader(){
+  const R=A.R;
+  $('#readerTitle').textContent=A.cur.title;
+  $('#pgTotal').textContent=A.cur.pageCount;$('#pgInput').max=A.cur.pageCount;
+  const p=R.sents.length?R.sents[Math.min(A.pos,R.sents.length-1)].p:0;
+  renderPage(p);updateSeek();
+  document.documentElement.style.setProperty('--fs',ST.fs+'px');
+}
+async function openBook(id,opt){
+  opt=opt||{};
+  const meta=A.books.find(b=>b.id===id);if(!meta)return;
+  closeMenus();
+  if(A.editing)await commitEdit();
+  if(A.cur&&A.cur.id!==id){pause();A.started=false;}
+  if(!A.cur||A.cur.id!==id){
+    const t=await store.get('texts',id);
+    if(!t){toast('No encontré el texto de este libro.');return;}
+    A.cur=meta;A.pages=t.pages;A.R=buildIndex(t.pages);
+    A.pos=Math.min(meta.pos||0,Math.max(0,A.R.sents.length-1));
+    rebuildHlMap();
+    if(ST.langMode==='auto'){const dl=detectLang(t.pages.slice(0,3).join(' '))||'es';if(dl!==ST.lang){ST.lang=dl;refreshVoices();toast('Idioma detectado: '+({es:'español',en:'inglés',pt:'portugués'}[dl]),3200);}}
+  }
+  meta.openedAt=Date.now();saveNow();
+  showView('read');setupReader();
+  markNow(A.pos,true);
+  if(opt.play)speak(A.pos);
+}
+function showView(v){
+  A.view=v;const rd=v==='read';
+  $('#viewLib').hidden=rd;$('#viewRead').hidden=!rd;$('#dock').hidden=!rd;
+  $('#btnBack').hidden=!rd;$('#brand').hidden=rd;$('#readerTitle').hidden=!rd;
+  $('#btnAdd').hidden=rd;$('#btnDict').hidden=rd;$('#btnPassages').hidden=!rd;$('#btnSearch').hidden=!rd;
+  if(!rd){renderLib();}
+  scrollTo(0,0);renderMini();requestAnimationFrame(updateDockH);
+}
+function updateDockH(){
+  const d=$('#dock'),m=$('#mini');
+  const h=!d.hidden?d.offsetHeight:(!m.hidden?m.offsetHeight:0);
+  document.documentElement.style.setProperty('--dock-h',h+'px');
+}
+function renderMini(){
+  const show=A.view==='lib'&&A.cur&&(A.playing||A.started);
+  $('#mini').hidden=!show;
+  if(show){
+    $('#miniTitle').textContent=A.cur.title;
+    $('#miniMeta').textContent='Pág. '+(pageOfPos(A.cur)+1)+' de '+A.cur.pageCount+' · '+pctOf(A.cur)+' %';
+    $('#miniBar').style.width=pctOf(A.cur)+'%';
+  }
+  requestAnimationFrame(updateDockH);
+}
+
+/* Pasajes */
+function renderPassages(){
+  const scope=A.passScope||'page';
+  $$('#passScope button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.scope===scope)));
+  const sents=scope==='all'?A.R.sents:A.R.sents.filter(s=>s.p===A.page);
+  const seen=new Map();
+  for(const s of sents){const si=A.R.sents.indexOf(s);for(const f of findRefs(s.t)){const k=f.canon+' '+f.rest;if(!seen.has(k))seen.set(k,Object.assign({},f,{idx:[]}));const e=seen.get(k);if(!e.idx.includes(si))e.idx.push(si);}}
+  const box=$('#passList');box.replaceChildren();
+  if(!seen.size){box.append(el('p','note',scope==='all'?'No encontré pasajes bíblicos en este libro.':'No hay pasajes en esta página.'));return;}
+  const list=el('div','pass-list');
+  for(const [k,f] of seen){
+    const row=el('div','pass-row');
+    const a=el('a');a.href=bibleUrl(f,ST.bible);a.target='_blank';a.rel='noopener noreferrer';a.append(el('b',null,k),el('span',null,'Abrir en '+ST.bible+' ↗'));
+    const n=f.idx.length;let c=0;
+    const back=el('button','pass-back','↩ En el texto'+(n>1?' (1/'+n+')':''));back.type='button';
+    back.title='Volver a donde aparece en el documento';
+    back.addEventListener('click',()=>{const i=f.idx[c%n];c++;if(n>1)back.textContent='↩ En el texto ('+((c%n)+1)+'/'+n+')';goToSentence(i);});
+    row.append(a,back);list.append(row);
+  }
+  box.append(list);
+}
+function openPassages(){
+  const seg=$('#passVer');seg.replaceChildren();
+  for(const [c] of BIBLES){const b=el('button',null,c);b.type='button';b.setAttribute('aria-pressed',String(c===ST.bible));b.addEventListener('click',()=>{ST.bible=c;saveSettings();$('#bibleVer').value=c;$$('#passVer button').forEach(x=>x.setAttribute('aria-pressed',String(x.textContent===c)));renderPassages();if(A.view==='read')renderPage(A.page);});seg.append(b);}
+  A.passScope='page';renderPassages();openSheet('#shPass');
+}
+
+/* Edición interna: se edita la página actual; si cambia el texto se crea una copia nueva */
+function setEditUI(){
+  const b=$('#btnEdit');
+  b.classList.toggle('on',A.editing);b.setAttribute('aria-pressed',String(A.editing));
+  b.innerHTML=ic(A.editing?'check':'pencil',18)+'<span>'+(A.editing?'Listo':'Editar')+'</span>';
+}
+function startEdit(){
+  if(!A.cur||A.editing)return;
+  pause();setHlMode(false);
+  A.editing=true;A.prevDockMin=A.dockMin;
+  const box=$('#text');box.hidden=true;
+  const msg=(ST.editCopy&&!A.cur.editedFrom)?'Edita esta página. Si cambias algo se crea una copia y el original no se toca.':'Edita esta página. Los cambios se guardan en este mismo libro.';
+  const note=el('p','editnote',msg+' Se guarda al salir de la edición o al pulsar play.');note.id='editNote';
+  const ta=el('textarea','editarea');ta.id='editArea';ta.value=A.pages[A.page]||'';ta.lang=ST.lang;ta.spellcheck=true;ta.style.minHeight='0';
+  box.after(note,ta);
+  fitEdit();
+  const vv=window.visualViewport;
+  A.editFit=()=>fitEdit();
+  if(vv)vv.addEventListener('resize',A.editFit);addEventListener('resize',A.editFit);
+  /* Ir a lo que estaba seleccionado o a la frase que se estaba leyendo */
+  const val=ta.value;let at=-1,len=0;
+  const pick=(Date.now()-(A.editSelT||0)<10000?(A.editSel||''):'').trim();A.editSel='';
+  if(pick){at=val.indexOf(pick);len=pick.length;if(at<0){const h=pick.replace(/\s+/g,' ').slice(0,40);at=val.replace(/\s+/g,' ').indexOf(h);len=0;}}
+  if(at<0&&A.R){
+    const ti=(A.tap&&A.tap.el&&A.tap.el.isConnected&&A.tap.el.dataset.i!=null)?+A.tap.el.dataset.i:A.pos;
+    const sn=A.R.sents[ti];
+    if(sn){const t=sn.t.trim();at=val.indexOf(t);len=t.length;if(at<0){at=val.replace(/\s+/g,' ').indexOf(t.replace(/\s+/g,' ').slice(0,40));len=0;}}
+  }
+  setDockMin(true);setEditUI();
+  requestAnimationFrame(()=>{
+    window.scrollTo({top:Math.max(0,ta.getBoundingClientRect().top+scrollY-64)});
+    ta.focus({preventScroll:true});
+    if(at>=0){
+      ta.setSelectionRange(at,at+len);
+      ta.scrollTop=Math.max(0,(at/Math.max(1,val.length))*ta.scrollHeight-ta.clientHeight/3);
+    }
+  });
+}
+function fitEdit(){
+  const ta=$('#editArea');if(!ta)return;
+  const vv=window.visualViewport,vh=vv?vv.height:innerHeight;
+  const top=ta.getBoundingClientRect().top;
+  const free=vh-Math.max(60,Math.min(top,70))-14;
+  ta.style.height=Math.max(160,Math.round(free))+'px';
+}
+
+async function commitEdit(){
+  if(!A.editing)return;
+  A.editing=false;
+  if(window.visualViewport&&A.editFit)visualViewport.removeEventListener('resize',A.editFit);if(A.editFit)removeEventListener('resize',A.editFit);
+  const ta=$('#editArea'),note=$('#editNote'),val=ta?ta.value:'';
+  if(ta)ta.remove();if(note)note.remove();
+  $('#text').hidden=false;setDockMin(!!A.prevDockMin);setEditUI();
+  const norm=s=>s.replace(/\s+/g,' ').trim(),old=A.pages[A.page]||'';
+  if(norm(val)===norm(old)){renderPage(A.page);return;}
+  const pages=A.pages.slice();pages[A.page]=textToParas(val).join('\n\n');
+  if(ST.editCopy&&!A.cur.editedFrom)await makeEditedCopy(pages);
+  else{await applyPages(pages);toast('Cambios guardados');}
+}
+async function applyPages(pages){
+  const meta=A.cur,idx=buildIndex(pages);
+  meta.total=idx.sents.length;meta.pageStarts=idx.pageStarts;meta.chars=idx.cum[idx.cum.length-1];
+  A.pages=pages;A.R=idx;
+  A.pos=Math.max(0,Math.min(idx.sents.length-1,idx.pageStarts[A.page]));meta.pos=A.pos;
+  rebuildHlMap();
+  await store.put('texts',{id:meta.id,pages});await store.put('books',meta);
+  setupReader();markNow(A.pos,true);
+}
+async function makeEditedCopy(pages){
+  const src=A.cur;
+  const b=await createBook({title:src.title+' (editado)',kind:src.kind,pages,cover:src.cover,source:src.source});
+  b.editedFrom=src.id;b.hls=(src.hls||[]).map(h=>Object.assign({},h));b.openedAt=Date.now();
+  A.cur=b;A.pages=pages;A.R=buildIndex(pages);
+  A.pos=Math.max(0,Math.min(A.R.sents.length-1,A.R.pageStarts[A.page]));b.pos=A.pos;
+  rebuildHlMap();await store.put('books',b);
+  setupReader();markNow(A.pos,true);
+  toast('Se creó «'+b.title+'». El original no cambió.',5200);
+}
+
+/* Barra de audio que baja y sube */
+function setDockMin(min){
+  A.dockMin=!!min;
+  $('#dock').classList.toggle('min',A.dockMin);
+  const f=$('#dockFold');
+  f.innerHTML=ic(A.dockMin?'chevUp':'chevDown',18);
+  f.setAttribute('aria-label',A.dockMin?'Subir los controles de audio':'Bajar los controles de audio');
+  requestAnimationFrame(updateDockH);
+}
+
+/* Resaltador con colores cálidos fluorescentes */
+function setHlMode(on,announce){
+  A.hlOn=!!on;document.body.classList.toggle('hlmode',A.hlOn);
+  const b=$('#btnHl');b.classList.toggle('on',A.hlOn);b.setAttribute('aria-pressed',String(A.hlOn));
+  b.innerHTML=ic('hl',18)+'<span>'+(A.hlOn?'Resaltando':'Resaltar')+'</span>';
+  if(!A.hlOn){hideHlbar();try{getSelection().removeAllRanges();}catch(e){}}
+  else if(announce)toast('Selecciona unas palabras y elige un color.');
+}
+function showHlbar(){clearTimeout(A.hideT);$('#hlbar').hidden=false;requestAnimationFrame(updateDockH);}
+function hideHlbar(){clearTimeout(A.hideT);$('#hlbar').hidden=true;}
+function offsetIn(sp,node,off){const r=document.createRange();r.selectNodeContents(sp);r.setEnd(node,off);return r.toString().length;}
+function applyHl(c){
+  const r=A.lastSel;if(!r||!A.cur)return;
+  let list=(A.cur.hls||[]).slice(),changed=false;
+  $$('#text .sent').forEach(sp=>{
+    if(!r.intersectsNode(sp))return;
+    const t=A.R.sents[+sp.dataset.i].t,sr=document.createRange();sr.selectNodeContents(sp);
+    let a=r.compareBoundaryPoints(Range.START_TO_START,sr)<=0?0:offsetIn(sp,r.startContainer,r.startOffset);
+    let b=r.compareBoundaryPoints(Range.END_TO_END,sr)>=0?t.length:offsetIn(sp,r.endContainer,r.endOffset);
+    while(a<b&&/\s/.test(t[a]))a++;
+    while(b>a&&/\s/.test(t[b-1]))b--;
+    if(b>a){list=mergeHl(list,t,a,b,c);changed=true;}
+  });
+  if(!changed)return;
+  A.cur.hls=list;rebuildHlMap();saveNow();A.dirty=true;updateSaveBtn();
+  try{getSelection().removeAllRanges();}catch(e){}
+  A.lastSel=null;hideHlbar();renderPage(A.page);
+}
+
+function bindTools(){
+  setEditUI();setHlMode(false);
+  $('#btnTp').innerHTML=ic('tele',18)+'<span>Teleprompter</span>';
+  $('#hlbar [data-c="x"]').innerHTML=ic('x',18);
+  setDockMin(!!ST.dockMin);setIc('#foldPlay','play',22);
+  $('#btnEdit').addEventListener('click',()=>{if(A.editing)commitEdit();else startEdit();});
+  $('#btnHl').addEventListener('click',async()=>{if(A.editing)await commitEdit();setHlMode(!A.hlOn,true);});
+  $('#dockFold').addEventListener('click',()=>{setDockMin(!A.dockMin);ST.dockMin=A.dockMin;saveSettings();});
+  $('#foldPlay').addEventListener('click',()=>{if(A.dockMin&&!A.editing){setDockMin(false);}togglePlay();});
+  const bar=$('#hlbar');
+  bar.addEventListener('pointerdown',e=>{e.preventDefault();clearTimeout(A.hideT);});
+  bar.addEventListener('click',e=>{const b=e.target.closest('[data-c]');if(b)applyHl(b.dataset.c);});
+  document.addEventListener('selectionchange',()=>{
+    if(A.view==='read'&&!A.editing){const sl=getSelection();if(sl&&sl.rangeCount&&!sl.isCollapsed&&$('#text').contains(sl.getRangeAt(0).commonAncestorContainer)){A.editSel=sl.toString();A.editSelT=Date.now();}}
+    if(!A.hlOn||A.view!=='read'||A.editing)return;
+    const sel=getSelection();
+    if(!sel||!sel.rangeCount||sel.isCollapsed||!sel.toString().trim()){clearTimeout(A.hideT);A.hideT=setTimeout(hideHlbar,450);return;}
+    const r=sel.getRangeAt(0);
+    if(!$('#text').contains(r.commonAncestorContainer))return;
+    A.lastSel=r.cloneRange();showHlbar();
+  });
+}
+
+/* Teleprompter: texto, avance automático y desplazamiento */
+const TP={on:false,fw:[],el:[],sent:[],sentFirst:new Map(),F:null,i:0,pos:0,curK:0,markedTo:0,nextPage:0,playing:false,cd:0,cdT:null,raf:0,last:0,hold:0,userScrolled:false,heard:[],partialDone:0,voiceAt:0,dstate:'idle',rec:false,recFinishing:false,recLines:[],recStart:0,tap:{el:null,t:0}};
+
+function tpBandPx(){return $('#tpScroll').clientHeight*ST.tp.band/100;}
+function layoutTp(){
+  const sc=$('#tpScroll'),tx=$('#tpText'),band=$('#tpBand');
+  if(!sc||!sc.clientHeight)return;
+  const by=tpBandPx(),lh=ST.tp.fs*1.45;
+  tx.style.setProperty('--tp-padtop',by+'px');tx.style.setProperty('--tp-padbot',Math.max(40,sc.clientHeight-by)+'px');
+  band.style.top=(by-lh/2)+'px';band.style.height=lh+'px';
+}
+function applyTpStyle(){
+  const t=ST.tp,fr=$('#tpFrame');
+  $('#tp').dataset.scheme=t.scheme;
+  const kb=$('#tp').classList.contains('kb');fr.className='tp-frame '+(kb?'top':t.anchor);fr.style.height=(kb?100:t.h)+'%';fr.style.setProperty('--tp-op',(t.op/100).toFixed(2));
+  const tx=$('#tpText');
+  tx.style.setProperty('--tp-fs',t.fs+'px');tx.style.setProperty('--tp-w',t.w+'rem');tx.style.setProperty('--tp-al',t.al);
+  tx.classList.toggle('mirror',!!t.mirror);tx.classList.toggle('dim',!!t.dim);
+  layoutTp();if(TP.on)easeScroll(true);
+}
+function tpAppend(maxWords){
+  const tx=$('#tpText');let added=0;
+  while(TP.nextPage<A.cur.pageCount&&added<maxWords){
+    const p=TP.nextPage++;
+    for(const idxs of (A.R.paraMap[p]||[])){
+      const par=el('p');
+      for(const s of idxs){
+        for(const tk of A.R.sents[s].t.split(/\s+/).filter(Boolean)){
+          const n=normWord(tk),sp=el('span',n?'w':'x',tk);
+          if(n){
+            if(!TP.sentFirst.has(s))TP.sentFirst.set(s,TP.fw.length);
+            sp.dataset.k=TP.fw.length;TP.fw.push(n);TP.el.push(sp);TP.sent.push(s);added++;
+          }
+          par.append(sp,' ');
+        }
+      }
+      tx.append(par);
+    }
+  }
+}
+function setCur(k){
+  const els=TP.el;if(!els.length)return;
+  k=Math.max(0,Math.min(els.length-1,k));
+  const old=els[TP.curK];if(old)old.classList.remove('cur');
+  if(k>TP.markedTo){for(let j=TP.markedTo;j<k;j++)els[j].classList.add('read');}
+  else if(k<TP.markedTo){for(let j=k;j<TP.markedTo;j++)els[j].classList.remove('read');}
+  TP.markedTo=k;TP.curK=k;els[k].classList.add('cur');
+}
+function maybeExtend(){if(TP.curK>TP.fw.length-150&&TP.nextPage<A.cur.pageCount)tpAppend(2500);}
+function easeScroll(snap){
+  const w=TP.el[TP.curK];if(!w)return;
+  const sc=$('#tpScroll'),target=Math.max(0,w.offsetTop+w.offsetHeight/2-tpBandPx()),diff=target-sc.scrollTop;
+  if(snap||Math.abs(diff)<0.5)sc.scrollTop=target;else sc.scrollTop+=diff*0.12;
+}
+function syncToBand(){
+  const sc=$('#tpScroll'),y=sc.scrollTop+tpBandPx();let lo=0,hi=TP.el.length-1;
+  while(lo<hi){const mid=(lo+hi)>>1,e=TP.el[mid];if(e.offsetTop+e.offsetHeight/2<y)lo=mid+1;else hi=mid;}
+  TP.i=lo;TP.pos=lo;TP.F.i=lo;TP.F.pend=null;setCur(lo);maybeExtend();
+}
+function tick(ts){
+  if(!TP.on)return;
+  TP.raf=requestAnimationFrame(tick);
+  const dt=Math.min(100,ts-(TP.last||ts));TP.last=ts;
+  const held=ts<TP.hold,m=ST.tp.mode;
+  if(TP.userScrolled&&!held){TP.userScrolled=false;if(m!=='manual')syncToBand();}
+  if(TP.playing&&m==='auto'&&TP.cd<=0&&!held){
+    TP.pos=Math.min(TP.fw.length-1,TP.pos+dt*ST.tp.wpm/60000);
+    const i=Math.floor(TP.pos);
+    if(i!==TP.curK){TP.i=i;TP.F.i=i;TP.F.pend=null;setCur(i);maybeExtend();}
+    if(TP.pos>=TP.fw.length-1&&TP.nextPage>=A.cur.pageCount){tpPause();toast('Fin del texto');}
+  }
+  if(!held&&m!=='manual')easeScroll(false);
+  const live=(TP.playing&&ST.tp.mode==='voz')||TP.rec;
+  $('#tpDot').className='dot'+(live?(performance.now()-Math.max(DL.lastIn,SRX.lastIn)<900?' hot':' on'):'');
+}
+
+/* Ajuste al área visible: con el teclado abierto el teleprompter ocupa solo lo que queda arriba */
+function tpFitViewport(){
+  const tp=$('#tp'),vv=window.visualViewport;
+  if(!vv||tp.hidden)return;
+  const kb=vv.height<window.innerHeight-120;
+  tp.classList.toggle('kb',kb);
+  if(kb){tp.style.top=vv.offsetTop+'px';tp.style.height=vv.height+'px';tp.style.bottom='auto';}
+  else{tp.style.top='';tp.style.height='';tp.style.bottom='';}
+  applyTpStyle();
+}
+/* Control */
+function tpStart(skipCount){
+  const m=ST.tp.mode;
+  if(m==='manual')return;
+  TP.playing=true;
+  if(m==='voz'&&!TP.rec){dlReset();TP.F.i=TP.i;TP.F.pend=null;}
+  tpSyncDictation();
+  if(m==='voz'){toast(srUsable()?'Escuchando: lee en voz alta y el texto avanza solo. «Grabar» es opcional.':'Pulsa el micrófono del teclado y lee en voz alta: el texto avanza solo.',4800);}
+  if(m==='auto'&&ST.tp.count&&!skipCount)tpCountdown();
+  tpUI();
+}
+function tpPause(){
+  TP.playing=false;clearInterval(TP.cdT);TP.cd=0;$('#tpCount').hidden=true;
+  tpSyncDictation();tpUI();
+}
+function tpCountdown(){
+  const c=$('#tpCount');TP.cd=3;c.hidden=false;c.textContent='3';
+  clearInterval(TP.cdT);
+  TP.cdT=setInterval(()=>{TP.cd--;if(TP.cd<=0){clearInterval(TP.cdT);c.hidden=true;}else c.textContent=String(TP.cd);},1000);
+}
+function tpToggle(){
+  if(ST.tp.mode==='manual'){toast('En modo manual te desplazas tú. Elige Automático o Mi voz para que avance solo.');return;}
+  if(TP.playing)tpPause();else tpStart();
+}
+function tpJump(k){
+  TP.i=k;TP.pos=k;TP.F.i=k;TP.F.pend=null;setCur(k);easeScroll(true);
+  if(!TP.playing&&ST.tp.mode!=='manual')tpStart(true);
+}
+function tpSpeed(d){
+  ST.tp.wpm=Math.max(40,Math.min(300,ST.tp.wpm+d));saveSettings();tpUI();
+  const s=$('#tpWpm');if(s){s.value=ST.tp.wpm;$('#tpWpmVal').textContent=ST.tp.wpm+' ppm';}
+}
+function tpSetMode(m){
+  if(TP.playing)tpPause();
+  ST.tp.mode=m;saveSettings();tpUI();
+}
+function tpUI(){
+  const m=ST.tp.mode,auto=m==='auto';
+  $$('#tpMode button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.m===m)));
+  const pl=$('#tpPlay');pl.innerHTML=ic(TP.playing?'pause':'play',28);pl.setAttribute('aria-label',TP.playing?'Pausar':'Iniciar');pl.style.opacity=m==='manual'?0.4:1;
+  for(const id of ['#tpSlow','#tpFast']){const b=$(id);b.disabled=!auto;b.style.opacity=auto?1:0.35;}
+  $('#tpSpd').textContent=auto?ST.tp.wpm+' ppm':(m==='voz'?'Mi voz':'Manual');
+  const r=$('#tpRec');r.classList.toggle('on',TP.rec);r.setAttribute('aria-pressed',String(TP.rec));
+  r.setAttribute('aria-label',TP.rec?'Detener y guardar la transcripción':'Grabar la transcripción en texto');
+  r.innerHTML=ic(TP.rec?'check':'dot',16)+'<span>'+(TP.rec?'Guardar':'Grabar')+'</span>';
+  renderHeard();
+}
+function renderHeard(){
+  const box=$('#tpWords');box.replaceChildren();
+  if(!TP.heard.length){
+    let msg='';
+    if(TP.playing&&ST.tp.mode==='voz')msg='Escuchando… lee el texto en voz alta';
+    else if(ST.tp.mode==='voz')msg=srUsable()?'Pulsa ▶ y lee en voz alta':'Pulsa ▶ y activa el micrófono del teclado';
+    box.append(el('span','no',msg));return;
+  }
+  for(const h of TP.heard.slice(-10))box.append(el('span',h.ok?'ok':'no',h.w));
+}
+function pushHeard(w,ok){TP.heard.push({w,ok:!!ok});if(TP.heard.length>30)TP.heard.shift();}
+
+/* Abrir y cerrar */
+async function openTp(){
+  if(!A.cur||!A.R.sents.length){toast('Este libro no tiene texto.');return;}
+  if(A.editing)await commitEdit();
+  pause();setHlMode(false);
+  TP.on=true;TP.fw=[];TP.el=[];TP.sent=[];TP.sentFirst=new Map();TP.markedTo=0;TP.curK=0;TP.heard=[];TP.partialDone=0;TP.playing=false;TP.cd=0;
+  $('#tpText').replaceChildren();$('#tpCount').hidden=true;
+  TP.nextPage=A.R.sents[A.pos].p;tpAppend(2500);
+  let k=0;
+  for(let s=A.pos;s<A.R.sents.length;s++){if(TP.sentFirst.has(s)){k=TP.sentFirst.get(s);break;}}
+  TP.i=k;TP.pos=k;TP.F=makeFollower(TP.fw,k);
+  $('#tp').hidden=false;applyTpStyle();setCur(k);easeScroll(true);
+  if(window.visualViewport){visualViewport.addEventListener('resize',tpFitViewport);visualViewport.addEventListener('scroll',tpFitViewport);}tpFitViewport();
+  tpUI();cancelAnimationFrame(TP.raf);TP.last=0;TP.raf=requestAnimationFrame(tick);
+  setWake(true,ST.tp.wake);
+}
+function closeTp(){
+  if(!TP.on)return;
+  tpPause();
+  if(TP.rec)finishRec(true);
+  srWant(false);DL.onTokens=null;dlSetActive(false);$('#tpDictSlot').hidden=true;
+  TP.on=false;cancelAnimationFrame(TP.raf);
+  if(window.visualViewport){visualViewport.removeEventListener('resize',tpFitViewport);visualViewport.removeEventListener('scroll',tpFitViewport);}
+  $('#tp').classList.remove('kb');$('#tp').style.top=$('#tp').style.height=$('#tp').style.bottom='';
+  const s=TP.sent[TP.curK];
+  $('#tp').hidden=true;$('#tpText').replaceChildren();
+  setWake(false);
+  if(s!=null)setPos(s,{scroll:true});
+  setTimeout(()=>autoSaveTick(true),400);
+}
+
+/* Línea de dictado: el micrófono del teclado escribe aquí y la página guarda el texto */
+const pad2=n=>String(n).padStart(2,'0');
+const fmtDate=d=>pad2(d.getDate())+'-'+pad2(d.getMonth()+1)+'-'+d.getFullYear()+' '+pad2(d.getHours())+':'+pad2(d.getMinutes());
+const countWords=s=>(s.trim().match(/\S+/g)||[]).length;
+const DL={wrap:null,ta:null,dot:null,msg:null,active:false,processed:0,lastIn:0,start:0,flushT:null,watch:null,saveT:null,onTokens:null,lost:false,ctx:'',quiet:false,beepT:null};
+function dlBuild(){
+  if(DL.wrap)return;
+  const w=el('div','dl'),row=el('div','dl-row');
+  DL.dot=el('span','dl-dot');
+  const ta=el('textarea','dictline');
+  ta.id='dictLine';ta.rows=1;ta.placeholder='Toca aquí y pulsa el micrófono del teclado';
+  ta.setAttribute('autocomplete','off');ta.setAttribute('autocapitalize','off');ta.setAttribute('autocorrect','off');
+  ta.setAttribute('spellcheck','false');ta.setAttribute('enterkeyhint','done');ta.setAttribute('aria-label','Línea de dictado');
+  const mic=el('button','dl-mic');mic.type='button';mic.id='dlMic';mic.innerHTML=ic('mic',20);mic.setAttribute('aria-label','Reanudar el dictado');
+  const msg=el('div','dl-msg');msg.hidden=true;
+  row.append(DL.dot,ta,mic);w.append(row,msg);
+  DL.wrap=w;DL.ta=ta;DL.msg=msg;
+  ta.addEventListener('input',dlInput);
+  ta.addEventListener('keydown',e=>{if(e.key==='Enter')e.preventDefault();});
+  ta.addEventListener('blur',()=>{if(DL.active)setTimeout(()=>{if(DL.active&&document.activeElement!==ta)dlLost('El teclado se cerró.');},1200);});
+  ta.addEventListener('focus',()=>{if(DL.active)dlLostClear();});
+  mic.addEventListener('click',dlResume);
+  try{const d=JSON.parse(localStorage.getItem('leo.draft')||'null');if(d&&typeof d.text==='string'){ta.value=d.text;DL.start=d.start||Date.now();dlCursorEnd();DL.processed=speechTokens(d.text).length;}}catch(e){}
+}
+function dlMount(parent){dlBuild();if(DL.wrap.parentNode!==parent)parent.append(DL.wrap);dlCursorEnd();}
+function dlCursorEnd(){const t=DL.ta;if(!t)return;t.scrollTop=t.scrollHeight;}
+function dlText(){return DL.ta?DL.ta.value:'';}
+function dlSaveDraft(){
+  clearTimeout(DL.saveT);
+  DL.saveT=setTimeout(()=>{try{const t=dlText();if(t.trim())localStorage.setItem('leo.draft',JSON.stringify({text:t,start:DL.start}));else localStorage.removeItem('leo.draft');}catch(e){}},400);
+}
+function dlReset(){
+  if(!DL.ta)dlBuild();
+  DL.ta.value='';DL.processed=0;DL.start=Date.now();clearTimeout(DL.flushT);dlLostClear();
+  try{localStorage.removeItem('leo.draft');}catch(e){}
+  dlStats();
+}
+function dlInput(){
+  DL.lastIn=performance.now();if(!DL.start)DL.start=Date.now();
+  dlCursorEnd();dlLostClear();dlProcess(false);if(!DL.quiet)dlSaveDraft();dlStats();
+}
+function dlProcess(final){
+  if(!DL.ta)return;
+  const toks=speechTokens(DL.ta.value);
+  if(toks.length<DL.processed)DL.processed=toks.length;
+  const upto=final?toks.length:Math.max(DL.processed,toks.length-1);
+  if(upto>DL.processed){
+    const fresh=toks.slice(DL.processed,upto);DL.processed=upto;
+    if(DL.onTokens)DL.onTokens(fresh);
+  }
+  clearTimeout(DL.flushT);
+  DL.flushT=setTimeout(()=>{dlProcess(true);if(DL.quiet&&DL.ta&&DL.ta.value.length>70){DL.ta.value='';DL.processed=0;dlStats();}},650);
+}
+function dlLost(text){
+  if(!DL.active||!DL.msg)return;
+  DL.lost=true;DL.msg.hidden=false;DL.msg.textContent=(text||'El dictado se detuvo.')+' Toca el micrófono del teclado.';
+  DL.dot.className='dl-dot lost';
+  try{DL.ta.focus({preventScroll:true});}catch(e){}
+  if(DL.ta)DL.ta.classList.add('lostbg');
+}
+function dlAlert(){}
+function dlLostClear(){DL.lost=false;clearInterval(DL.beepT);if(DL.ta)DL.ta.classList.remove('lostbg');if(DL.msg)DL.msg.hidden=true;}
+function dlResume(){
+  if(!DL.ta)return;
+  dlLostClear();DL.lastIn=performance.now();
+  DL.ta.focus();dlCursorEnd();
+  const n=DL.ta.value.length;try{DL.ta.setSelectionRange(n,n);}catch(e){}
+  toast('Pulsa el micrófono del teclado y sigue hablando',3200);
+}
+function dlSetActive(on){
+  DL.active=!!on;clearInterval(DL.watch);
+  if(DL.dot)DL.dot.className='dl-dot';
+  if(on){
+    DL.lastIn=performance.now();
+    DL.watch=setInterval(()=>{
+      if(!DL.active)return;
+      const quiet=performance.now()-DL.lastIn;
+      const lim=DL.quiet?7000:12000;
+      if(quiet>lim&&!DL.lost&&document.activeElement===DL.ta)dlLost('Dejó de escuchar.');
+      else if(quiet>lim&&!DL.lost&&!document.hidden&&document.activeElement!==DL.ta)dlLost('Se perdió el foco del teclado.');
+      const hot=performance.now()-DL.lastIn<900;
+      DL.dot.className='dl-dot'+(DL.lost?' lost':(hot?' hot':' on'));
+      dlStats();
+    },500);
+  }
+}
+function dlStats(){
+  const t=dlText(),c=$('#dictCount'),tm=$('#dictTime');
+  if(c)c.textContent=countWords(t)+' palabras';
+  if(tm){const s=DL.start?Math.floor((Date.now()-DL.start)/1000):0;tm.textContent=pad2(Math.floor(s/60))+':'+pad2(s%60);}
+}
+function defaultRecName(extra){return 'Dictado '+fmtDate(new Date())+(extra?' · '+extra:'');}
+
+/* Módulo: Dictar un texto (biblioteca) */
+function openDictSheet(){
+  dlBuild();A.dictSheet=true;
+  if(!dlText().trim())dlReset();
+  $('#dictName').value=defaultRecName();
+  $('#dictDiscard').textContent='Descartar';
+  dlMount($('#shDictSlot'));openSheet('#shDict');
+  DL.onTokens=null;DL.quiet=false;DL.ta.classList.remove('quiet');DL.ta.placeholder='Toca aquí y pulsa el micrófono del teclado';dlSetActive(true);dlStats();
+  DL.ta.focus();
+}
+function onSheetClose(){
+  if(A.dictSheet&&!$('#shDict').hidden){A.dictSheet=false;dlSetActive(false);dlSaveDraft();}
+}
+async function saveDictation(){
+  const text=punctuate(dlText().trim(),{lang:ST.lang,auto:ST.autoPunct!==false});
+  if(!text){toast('Todavía no hay texto dictado.');return;}
+  const name=($('#dictName').value||'').trim()||defaultRecName();
+  const r=await createRec(name,text);
+  A.dictSheet=false;dlSetActive(false);dlReset();
+  closeSheets();A.libTab='recs';renderLib();
+  toast('Guardado en Textos grabados: «'+r.name+'»',4200);
+}
+function discardDictation(){
+  const b=$('#dictDiscard');
+  if(!dlText().trim()){A.dictSheet=false;dlSetActive(false);closeSheets();return;}
+  if(b.dataset.arm!=='1'){b.dataset.arm='1';b.textContent='¿Descartar? Confirmar';setTimeout(()=>{b.dataset.arm='0';b.textContent='Descartar';},3500);return;}
+  b.dataset.arm='0';b.textContent='Descartar';
+  A.dictSheet=false;dlSetActive(false);dlReset();closeSheets();toast('Dictado descartado');
+}
+
+/* Textos grabados */
+async function createRec(name,text){
+  const now=Date.now(),r={id:'r'+now.toString(36)+Math.random().toString(36).slice(2,5),name:name.slice(0,120),text,created:now,updated:now};
+  await store.put('recs',r);A.recs.push(r);return r;
+}
+function renderRecs(){
+  const q=$('#q').value.trim().toLowerCase();
+  const list=A.recs.filter(r=>!q||r.name.toLowerCase().includes(q)||r.text.toLowerCase().includes(q)).sort((a,b)=>b.created-a.created);
+  const box=$('#recList');box.replaceChildren();
+  if(!list.length){
+    const e=el('div','empty');e.append(el('h2',null,A.recs.length?'Sin resultados':'Aquí verás tus dictados'),el('p',null,A.recs.length?'Prueba con otra palabra.':'Pulsa Dictar, habla con el micrófono del teclado y guarda. Cada texto queda aquí con su fecha.'));
+    box.append(e);return;
+  }
+  for(const r of list){
+    const wrap=el('div','rec-item');wrap.dataset.id=r.id;
+    const grip=el('button','rec-grip');grip.type='button';grip.innerHTML=ic('grip',18);grip.setAttribute('aria-label','Mantén y arrastra al tacho para eliminar');grip.title='Arrastra al tacho para eliminar';
+    const b=el('div','rec-row');b.tabIndex=0;b.setAttribute('role','button');
+    b.addEventListener('keydown',e=>{if(e.target===b&&(e.key==='Enter'||e.key===' ')){e.preventDefault();openRec(r.id);}});
+    b.append(el('div','rec-name',r.name),el('div','rec-meta',fmtDate(new Date(r.created))+' · '+countWords(r.text)+' palabras'),el('div','rec-snip',r.text));
+    b.addEventListener('click',()=>openRec(r.id));
+    const acts=el('div','rec-acts');
+    const ren=el('button','icon-btn');ren.type='button';ren.innerHTML=ic('pencil',18);ren.setAttribute('aria-label','Cambiar nombre');ren.addEventListener('click',()=>renameRecInline(wrap,r));
+    const dup=el('button','icon-btn');dup.type='button';dup.innerHTML=ic('copy',18);dup.setAttribute('aria-label','Hacer una copia');dup.addEventListener('click',()=>duplicateRec(r.id));
+    acts.append(ren,dup);
+    wrap.append(grip,b,acts);box.append(wrap);
+    bindRecDrag(grip,wrap,r.id);
+  }
+}
+function renameRecInline(wrap,r){
+  const nm=wrap.querySelector('.rec-name');if(!nm||wrap.querySelector('input.rec-edit'))return;
+  const inp=el('input','rec-edit');inp.type='text';inp.maxLength=120;inp.value=r.name;
+  nm.replaceWith(inp);inp.focus();inp.select();
+  let done=false;
+  const fin=async(save)=>{
+    if(done)return;done=true;
+    const v=inp.value.trim();
+    if(save&&v&&v!==r.name){r.name=v.slice(0,120);r.updated=Date.now();await store.put('recs',r);toast('Nombre cambiado');}
+    renderLib();
+  };
+  inp.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();fin(true);}else if(e.key==='Escape')fin(false);});
+  inp.addEventListener('blur',()=>fin(true));
+}
+async function duplicateRec(id){
+  const r=A.recs.find(x=>x.id===id);if(!r)return;
+  const c=await createRec(r.name+' (copia)',r.text);renderLib();toast('Copia creada: «'+c.name+'»');
+}
+let undoRec=null;
+async function trashRec(id){
+  const r=A.recs.find(x=>x.id===id);if(!r)return;
+  await store.delOne('recs',id);A.recs=A.recs.filter(x=>x.id!==id);undoRec=r;renderLib();
+  toastAct('Texto eliminado','Deshacer',async()=>{if(!undoRec)return;const u=undoRec;undoRec=null;await store.put('recs',u);A.recs.push(u);renderLib();toast('Texto recuperado');},6500);
+}
+function bindRecDrag(grip,item,id){
+  grip.addEventListener('pointerdown',e=>{
+    e.preventDefault();grip.setPointerCapture(e.pointerId);
+    const trash=$('#trash'),sx=e.clientX,sy=e.clientY;
+    trash.hidden=false;item.classList.add('dragging');
+    const over=(x,y)=>{const r=trash.getBoundingClientRect();return x>=r.left-14&&x<=r.right+14&&y>=r.top-14&&y<=r.bottom+14;};
+    const mv=ev=>{item.style.transform='translate('+(ev.clientX-sx)+'px,'+(ev.clientY-sy)+'px)';trash.classList.toggle('hot',over(ev.clientX,ev.clientY));};
+    const end=async ev=>{
+      grip.removeEventListener('pointermove',mv);grip.removeEventListener('pointerup',end);grip.removeEventListener('pointercancel',end);
+      const hit=ev.type==='pointerup'&&over(ev.clientX,ev.clientY);
+      trash.hidden=true;trash.classList.remove('hot');item.classList.remove('dragging');item.style.transform='';
+      if(hit)trashRec(id);
+    };
+    grip.addEventListener('pointermove',mv);grip.addEventListener('pointerup',end);grip.addEventListener('pointercancel',end);
+  });
+}
+function recLink(text){
+  const full=encodeURIComponent(text),long=full.length>3200;
+  const url='https://wa.me/?text='+(long?encodeURIComponent(text.slice(0,1200)+' …'):full);
+  return {url,long};
+}
+function openRec(id){
+  const r=A.recs.find(x=>x.id===id);if(!r)return;
+  A.recId=id;$('#recName').value=r.name;$('#recText').value=r.text;syncRecUI();
+  $('#recDel').textContent='Eliminar';$('#recDel').dataset.arm='0';openSheet('#shRec');
+}
+function syncRecUI(){
+  const r=A.recs.find(x=>x.id===A.recId);if(!r)return;
+  const text=$('#recText').value,lk=recLink(text);
+  $('#recWa').href=lk.url;
+  $('#recNote').textContent=fmtDate(new Date(r.created))+' · '+countWords(text)+' palabras'+(lk.long?' · Es largo: WhatsApp recibirá solo el inicio. Descarga el .txt para enviarlo completo.':'');
+}
+async function saveRecEdits(quiet){
+  const r=A.recs.find(x=>x.id===A.recId);if(!r)return;
+  r.name=($('#recName').value||'').trim().slice(0,120)||defaultRecName();r.text=$('#recText').value;r.updated=Date.now();
+  await store.put('recs',r);renderLib();syncRecUI();if(!quiet)toast('Cambios guardados');
+}
+async function deleteRec(){
+  const b=$('#recDel');
+  if(b.dataset.arm!=='1'){b.dataset.arm='1';b.textContent='¿Eliminar? Confirmar';setTimeout(()=>{b.dataset.arm='0';b.textContent='Eliminar';},3500);return;}
+  await store.delOne('recs',A.recId);A.recs=A.recs.filter(x=>x.id!==A.recId);closeSheets();renderLib();toast('Texto eliminado');
+}
+async function recToBook(){
+  const r=A.recs.find(x=>x.id===A.recId);if(!r)return;
+  const paras=textToParas(r.text);if(!paras.length){toast('El texto está vacío.');return;}
+  const b=await createBook({title:r.name,kind:'texto',pages:paginate(paras)});
+  closeSheets();A.libTab='books';renderLib();openBook(b.id,{play:true});
+}
+
+
+
+/* Archivos: descargar, copiar, respaldo */
+const fileSafe=s=>String(s).replace(/[\\/:*?"<>|]+/g,' ').replace(/\s+/g,' ').trim().slice(0,80)||'LeamosTxTs';
+function waParts(text){
+  const out=[];let i=0;
+  while(i<text.length){
+    let j=Math.min(text.length,i+1300);
+    if(j<text.length){const k=Math.max(text.lastIndexOf('\n',j),text.lastIndexOf('. ',j)+1,text.lastIndexOf(' ',j));if(k>i+600)j=k+1;}
+    out.push(text.slice(i,j).trim());i=j;
+  }
+  return out.filter(Boolean);
+}
+const MIME={txt:'text/plain;charset=utf-8',json:'application/json',html:'text/html;charset=utf-8',pdf:'application/pdf',docx:'application/vnd.openxmlformats-officedocument.wordprocessingml.document'};
+const mimeFor=n=>MIME[(String(n).split('.').pop()||'').toLowerCase()]||'application/octet-stream';
+const blobOf=(data,name)=>data instanceof Blob?data:new Blob([data],{type:mimeFor(name)});
+let lastSave=null;
+/* Guardar: descarga normal del navegador. Si no se pudo, se ofrece copiar el texto */
+async function saveFile(filename,data,okMsg,fallbackText){
+  lastSave={filename,data,okMsg,fallbackText};
+  try{
+    const url=URL.createObjectURL(blobOf(data,filename));
+    const a=document.createElement('a');a.href=url;a.download=filename;a.rel='noopener';a.style.display='none';
+    document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),120000);
+    toast((okMsg||'Archivo listo')+'. Búscalo en tu carpeta de Descargas.',5200);
+    return true;
+  }catch(e){return saveHelp('No se pudo crear el archivo.');}
+}
+function saveHelp(why){
+  const fallbackText=lastSave&&lastSave.fallbackText;
+  $('#saveWhy').textContent=why;$('#saveText').value=fallbackText||'';$('#saveTextBox').hidden=!fallbackText;
+  const box=$('#saveParts');box.replaceChildren();
+  if(fallbackText){
+    const parts=waParts(fallbackText),n=parts.length;
+    parts.forEach((p,k)=>{const a=el('a','btn sm','WhatsApp '+(k+1)+'/'+n);a.target='_blank';a.rel='noopener noreferrer';a.href='https://wa.me/?text='+encodeURIComponent((n>1?'['+(k+1)+'/'+n+'] ':'')+p);box.append(a);});
+  }
+  openSheet('#shSave');return false;
+}
+/* Compartir con el menú del teléfono (WhatsApp, Drive, correo, imprimir…) */
+async function shareFile(filename,data,title){
+  try{
+    const f=new File([blobOf(data,filename)],filename,{type:mimeFor(filename).split(';')[0]});
+    if(navigator.canShare&&navigator.canShare({files:[f]})){await navigator.share({files:[f],title:title||filename});return true;}
+  }catch(e){if(e&&e.name==='AbortError')return true;}
+  return false;
+}
+async function recFile(fmt){
+  const r=A.recs.find(x=>x.id===A.recId);if(!r)return null;
+  if(!r.text.trim()){toast('El texto está vacío.');return null;}
+  const base=fileSafe(r.name);
+  if(fmt==='docx')return {name:base+'.docx',data:makeDocx(r.name,r.text),r};
+  if(fmt==='pdf')return {name:base+'.pdf',data:makePdf(r.name,r.text),r};
+  return {name:base+'.txt',data:r.text,r};
+}
+async function recSaveFile(){await saveRecEdits(true);const f=await recFile($('#recFmt').value);if(f)saveFile(f.name,f.data,'Guardado '+f.name,f.r.text);}
+async function recShare(){
+  await saveRecEdits(true);const f=await recFile($('#recFmt').value);if(!f)return;
+  if(await shareFile(f.name,f.data,f.r.name))return;
+  toast('Este navegador no tiene menú de compartir; descargo el archivo.',4200);saveFile(f.name,f.data,'Guardado '+f.name,f.r.text);
+}
+function printRec(){
+  const r=A.recs.find(x=>x.id===A.recId);if(!r)return;
+  const pa=$('#printArea');pa.replaceChildren(el('h1',null,r.name),el('div','pt',$('#recText').value));
+  document.body.classList.add('printing');
+  const done=()=>{document.body.classList.remove('printing');removeEventListener('afterprint',done);};
+  addEventListener('afterprint',done);setTimeout(done,120000);
+  try{window.print();}catch(e){done();saveHelp('Este navegador no puede imprimir desde aquí.');}
+}
+/* Generadores de .docx y .pdf (sin librerías) */
+const CRC_T=(()=>{const t=new Uint32Array(256);for(let n=0;n<256;n++){let c=n;for(let k=0;k<8;k++)c=c&1?0xEDB88320^(c>>>1):c>>>1;t[n]=c>>>0;}return t;})();
+function crc32(u){let c=0xFFFFFFFF;for(let i=0;i<u.length;i++)c=CRC_T[(c^u[i])&255]^(c>>>8);return (c^0xFFFFFFFF)>>>0;}
+function zipStore(files){
+  const enc=new TextEncoder(),parts=[],cen=[];let off=0;
+  const u16=n=>[n&255,(n>>8)&255],u32=n=>[n&255,(n>>8)&255,(n>>16)&255,(n>>>24)&255];
+  for(const f of files){
+    const name=enc.encode(f.name),data=enc.encode(f.data),crc=crc32(data);
+    const head=new Uint8Array([0x50,0x4b,3,4,...u16(20),...u16(0x0800),...u16(0),...u16(0),...u16(0x21),...u32(crc),...u32(data.length),...u32(data.length),...u16(name.length),...u16(0)]);
+    parts.push(head,name,data);
+    cen.push(new Uint8Array([0x50,0x4b,1,2,...u16(20),...u16(20),...u16(0x0800),...u16(0),...u16(0),...u16(0x21),...u32(crc),...u32(data.length),...u32(data.length),...u16(name.length),...u16(0),...u16(0),...u16(0),...u16(0),...u32(0),...u32(off)]),name);
+    off+=head.length+name.length+data.length;
+  }
+  let cs=0;for(const c of cen)cs+=c.length;
+  const end=new Uint8Array([0x50,0x4b,5,6,0,0,0,0,...u16(files.length),...u16(files.length),...u32(cs),...u32(off),0,0]);
+  return new Blob([...parts,...cen,end],{type:'application/vnd.openxmlformats-officedocument.wordprocessingml.document'});
+}
+const xesc=s=>s.replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c])).replace(/[\u0000-\u0008\u000b\u000c\u000e-\u001f]/g,'');
+function makeDocx(title,text){
+  const para=(t,bold)=>'<w:p><w:r>'+(bold?'<w:rPr><w:b/><w:sz w:val="32"/></w:rPr>':'')+'<w:t xml:space="preserve">'+xesc(t)+'</w:t></w:r></w:p>';
+  const body=para(title,true)+text.split(/\r?\n/).map(l=>para(l)).join('');
+  return zipStore([
+    {name:'[Content_Types].xml',data:'<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/></Types>'},
+    {name:'_rels/.rels',data:'<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/></Relationships>'},
+    {name:'word/document.xml',data:'<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:body>'+body+'<w:sectPr><w:pgSz w:w="11906" w:h="16838"/><w:pgMar w:top="1134" w:right="1134" w:bottom="1134" w:left="1134" w:header="708" w:footer="708" w:gutter="0"/></w:sectPr></w:body></w:document>'}
+  ]);
+}
+const CP1252={'€':0x80,'…':0x85,'‘':0x91,'’':0x92,'“':0x93,'”':0x94,'•':0x95,'–':0x96,'—':0x97,'™':0x99};
+function pdfBytes(s){
+  const out=[];
+  for(const ch of s){
+    const c=ch.codePointAt(0);
+    if(c===0x28||c===0x29||c===0x5c){out.push(0x5c,c);}
+    else if(c>=32&&c<=255)out.push(c);
+    else if(CP1252[ch])out.push(CP1252[ch]);
+    else out.push(0x3f);
+  }
+  return out;
+}
+function makePdf(title,text){
+  const W=595,H=842,M=56,FS=11,LH=15,maxW=W-2*M;
+  let measure;
+  try{const cv=document.createElement('canvas').getContext('2d');cv.font=FS+'px Helvetica, Arial, sans-serif';measure=s=>cv.measureText(s).width;}catch(e){}
+  if(!measure)measure=s=>s.length*FS*0.5;
+  const lines=[{t:title,bold:true}];lines.push({t:''});
+  for(const raw of text.split(/\r?\n/)){
+    if(!raw.trim()){lines.push({t:''});continue;}
+    let cur='';
+    for(const w of raw.split(/\s+/)){
+      const tryS=cur?cur+' '+w:w;
+      if(measure(tryS)>maxW&&cur){lines.push({t:cur});cur=w;}else cur=tryS;
+    }
+    lines.push({t:cur});
+  }
+  const per=Math.floor((H-2*M)/LH),pages=[];
+  for(let i=0;i<lines.length;i+=per)pages.push(lines.slice(i,i+per));
+  const objs=[];
+  const nPages=pages.length,firstPage=4;
+  objs[1]=[...pdfAscii('<< /Type /Catalog /Pages 2 0 R >>')];
+  objs[2]=[...pdfAscii('<< /Type /Pages /Kids ['+pages.map((_,i)=>(firstPage+i*2)+' 0 R').join(' ')+'] /Count '+nPages+' >>')];
+  objs[3]=[...pdfAscii('<< /Font << /F1 << /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >> /F2 << /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >> >> >>')];
+  pages.forEach((pl,pi)=>{
+    const pn=firstPage+pi*2,cn=pn+1;
+    objs[pn]=[...pdfAscii('<< /Type /Page /Parent 2 0 R /MediaBox [0 0 '+W+' '+H+'] /Resources 3 0 R /Contents '+cn+' 0 R >>')];
+    let st=[];
+    pl.forEach((ln,li)=>{
+      const y=H-M-li*LH-FS;
+      st.push(...pdfAscii('BT /'+(ln.bold?'F2 14':'F1 '+FS)+' Tf '+M+' '+y+' Td ('),...pdfBytes(ln.t),...pdfAscii(') Tj ET\n'));
+    });
+    objs[cn]=[...pdfAscii('<< /Length '+st.length+' >>\nstream\n'),...st,...pdfAscii('\nendstream')];
+  });
+  const buf=[...pdfAscii('%PDF-1.4\n')],offs=[];
+  for(let n=1;n<objs.length;n++){offs[n]=buf.length;buf.push(...pdfAscii(n+' 0 obj\n'),...objs[n],...pdfAscii('\nendobj\n'));}
+  const xr=buf.length;
+  buf.push(...pdfAscii('xref\n0 '+objs.length+'\n0000000000 65535 f \n'));
+  for(let n=1;n<objs.length;n++)buf.push(...pdfAscii(String(offs[n]).padStart(10,'0')+' 00000 n \n'));
+  buf.push(...pdfAscii('trailer\n<< /Size '+objs.length+' /Root 1 0 R >>\nstartxref\n'+xr+'\n%%EOF'));
+  return new Blob([new Uint8Array(buf)],{type:'application/pdf'});
+}
+const pdfAscii=s=>{const a=[];for(let i=0;i<s.length;i++)a.push(s.charCodeAt(i)&255);return a;};
+async function copyText(s,msg){
+  try{await navigator.clipboard.writeText(s);toast(msg||'Copiado');}
+  catch(e){toast('El navegador no permitió copiar. Selecciona el texto y cópialo.',5000);}
+}
+async function exportBookTxt(b){
+  const t=await store.get('texts',b.id);if(!t){toast('No encontré el texto de este libro.');return;}
+  await saveFile(fileSafe(b.title)+'.txt',t.pages.join('\n\n'),'Texto exportado',t.pages.join('\n\n'));
+}
+async function buildBackup(){
+  const books=[];
+  for(const b of A.books){
+    const t=await store.get('texts',b.id);if(!t)continue;
+    const m=Object.assign({},b);delete m.pageStarts;delete m.total;delete m.chars;delete m.pageCount;
+    m.pages=t.pages;books.push(m);
+  }
+  return JSON.stringify({app:'leo-por-ti',version:1,exported:new Date().toISOString(),books,recs:A.recs},null,0);
+}
+async function openBackup(){
+  closeSheets();
+  const s=await buildBackup();
+  $('#bkInfo').textContent=A.books.length+' libros y '+A.recs.length+' textos grabados · '+(s.length/1048576).toFixed(2)+' MB. El respaldo incluye el texto, tu avance y los resaltados.';
+  openSheet('#shBackup');
+}
+async function shareBackup(){
+  const s=await buildBackup(),name='LeamosTxTs - respaldo '+new Date().toISOString().slice(0,10)+'.json';
+  if(await shareFile(name,s,'Respaldo de LeamosTxTs'))return;
+  toast('Este navegador no tiene menú de compartir; descargo el archivo.',4200);saveFile(name,s,'Respaldo guardado',s);
+}
+/* La app lleva tus datos dentro: un solo archivo .html que abre en cualquier navegador */
+const FSH={handle:null,pendingPerm:false};
+const APPNAME='LeamosTxTs.html';
+async function buildAppBlob(){
+  const s=(await buildBackup()).replace(/</g,'\\u003c');
+  const html=PRISTINE.replace(/(<script type="application\/json" id="embeddedData">)[\s\S]*?(<\/script>)/,(m,a,z)=>a+s+z);
+  return new Blob(['<!doctype html>\n'+html],{type:'text/html'});
+}
+function updateSaveBtn(){
+  const b=$('#btnSaveApp');if(!b)return;
+  b.classList.toggle('dirty',!!A.dirty||!!A.memMode);
+  const hh=$('#saveHint');if(hh)hh.hidden=!(A.dirty||A.memMode);
+  b.setAttribute('aria-label',A.dirty?'Guardar copia de la app: hay cambios sin guardar (Ctrl+G)':'Guardar copia de la app con mis datos (Ctrl+G)');
+  b.title=A.memMode?'Este navegador no conserva datos: guarda la copia de la app (Ctrl+G)':(A.dirty?'Hay cambios sin guardar · Ctrl+G':'Guardar copia de la app con mis datos · Ctrl+G');
+}
+function markSaved(msg,quiet){
+  A.dirty=false;A.lastSaved=Date.now();
+  try{localStorage.setItem('leo.manualSaved','1');}catch(e){}
+  updateSaveBtn();if(!quiet)toast(msg,4200);
+}
+function autoEnabled(){let m=false;try{m=localStorage.getItem('leo.manualSaved')==='1';}catch(e){}return ST.autoSave&&(m||!!FSH.handle||A.savedManually);}
+async function loadFsHandle(){
+  try{const r=await store.get('meta','fsh');if(r&&r.h){FSH.handle=r.h;
+    const p=await r.h.queryPermission({mode:'readwrite'});
+    if(p!=='granted'){FSH.pendingPerm=true;
+      addEventListener('click',async()=>{if(!FSH.pendingPerm)return;FSH.pendingPerm=false;try{await FSH.handle.requestPermission({mode:'readwrite'});}catch(e){}},{once:true,capture:true});}
+  }}catch(e){}
+}
+/* manual: el usuario lo pidió (puede abrir el selector de archivo). No manual: autoguardado, nunca interrumpe */
+async function saveApp(manual,saveAs){
+  const blob=await buildAppBlob();
+  if(blob.size<20000){if(manual)toast('No se pudo preparar la copia de la app.');return false;}
+  if(window.showSaveFilePicker){
+    try{
+      let h=FSH.handle;
+      if(h&&!saveAs){
+        let p=await h.queryPermission({mode:'readwrite'});
+        if(p!=='granted'){if(!manual)return false;p=await h.requestPermission({mode:'readwrite'});}
+        if(p!=='granted')h=null;
+      }
+      if(!h||saveAs){
+        if(!manual)return false;
+        h=await showSaveFilePicker({suggestedName:APPNAME,types:[{description:'LeamosTxTs',accept:{'text/html':['.html']}}]});
+        FSH.handle=h;try{await store.put('meta',{id:'fsh',h});}catch(e){}
+      }
+      const w=await h.createWritable();await w.write(blob);await w.close();
+      A.savedManually=A.savedManually||manual;markSaved('Guardado en «'+h.name+'»',!manual);return true;
+    }catch(e){if(e&&e.name==='AbortError')return false;if(!manual)return false;}
+  }
+  if(!manual)return false;
+  A.savedManually=true;
+  const ok=await saveFile(APPNAME,blob,'Copia de la app guardada');
+  if(ok)markSaved('',true);
+  return ok;
+}
+function exportApp(){return saveApp(true,false);}
+async function autoSaveTick(force){
+  if(!autoEnabled()||!A.dirty)return;
+  if(TP.on&&!force){A.autoPending=true;return;}
+  A.autoPending=false;
+  if(await saveApp(false))return;
+  if(window.showSaveFilePicker&&FSH.handle&&!FSH.pendingPerm&&!force)return;
+}
+async function importEmbedded(){
+  let raw='';try{raw=($('#embeddedData').textContent||'').trim();}catch(e){}
+  if(!raw)return false;
+  let o;try{o=JSON.parse(raw);}catch(e){return false;}
+  if(!o||o.app!=='leo-por-ti')return false;
+  let seen='';try{seen=localStorage.getItem('leo.emb')||'';}catch(e){}
+  if(store.ok&&seen===String(o.exported))return !!((o.books||[]).length||(o.recs||[]).length);
+  try{await importBackup(raw);try{localStorage.setItem('leo.emb',String(o.exported));}catch(e){}}catch(e){}
+  return true;
+}
+async function importBackup(txt){
+  let o;try{o=JSON.parse(txt);}catch(e){throw new Error('Ese archivo no es un respaldo de LeamosTxTs.');}
+  if(!o||o.app!=='leo-por-ti'||(!Array.isArray(o.books)&&!Array.isArray(o.recs)))throw new Error('Ese archivo no es un respaldo de LeamosTxTs.');
+  const haveB=new Set(A.books.map(b=>b.id)),haveR=new Set(A.recs.map(r=>r.id));let nb=0,nr=0,sk=0;
+  for(const x of o.books||[]){
+    if(!x||typeof x.id!=='string'||typeof x.title!=='string'||!Array.isArray(x.pages)||!x.pages.every(p=>typeof p==='string'))continue;
+    const id=x.id.slice(0,40);if(haveB.has(id)){sk++;continue;}
+    const idx=buildIndex(x.pages);
+    const hls=Array.isArray(x.hls)?x.hls.filter(h=>h&&typeof h.t==='string'&&Number.isInteger(h.a)&&Number.isInteger(h.b)&&'yocp'.includes(h.c)):[];
+    const meta={id,title:x.title.slice(0,120)||'Sin título',kind:KIND[x.kind]?x.kind:'texto',source:typeof x.source==='string'?x.source.slice(0,500):'',pageCount:x.pages.length,total:idx.sents.length,pageStarts:idx.pageStarts,chars:idx.cum[idx.cum.length-1],pos:Math.max(0,Math.min(idx.sents.length-1,Number.isInteger(x.pos)?x.pos:0)),cover:(typeof x.cover==='string'&&x.cover.startsWith('data:image/')&&x.cover.length<600000)?x.cover:null,addedAt:Number.isFinite(x.addedAt)?x.addedAt:Date.now(),openedAt:0,hls};
+    if(typeof x.editedFrom==='string')meta.editedFrom=x.editedFrom.slice(0,40);
+    await store.put('texts',{id,pages:x.pages});await store.put('books',meta);A.books.push(meta);haveB.add(id);nb++;
+  }
+  for(const x of o.recs||[]){
+    if(!x||typeof x.id!=='string'||typeof x.text!=='string')continue;
+    const id=x.id.slice(0,40);if(haveR.has(id)){sk++;continue;}
+    const r={id,name:String(x.name||defaultRecName()).slice(0,120),text:x.text,created:Number.isFinite(x.created)?x.created:Date.now(),updated:Number.isFinite(x.updated)?x.updated:Date.now()};
+    await store.put('recs',r);A.recs.push(r);haveR.add(id);nr++;
+  }
+  renderLib();
+  return 'Importados '+nb+' libros y '+nr+' textos'+(sk?' ('+sk+' ya estaban)':'');
+}
+
+/* Teleprompter: palabras que llegan de la línea de dictado */
+function tpTokens(fresh){
+  const follow=ST.tp.mode==='voz'&&TP.playing&&TP.on&&TP.cd<=0;
+  const res=follow?TP.F.feed(fresh):fresh.map(()=>0);
+  fresh.forEach((w,k)=>pushHeard(w,res[k]));
+  if(follow&&res.includes(1)){
+    TP.i=TP.F.i;TP.pos=TP.i;setCur(TP.i);maybeExtend();
+    if(TP.F.i>=TP.fw.length&&TP.nextPage>=A.cur.pageCount){tpPause();toast('Fin del texto');}
+  }
+  renderHeard();
+}
+/* Reconocimiento de voz directo (sin pulsar el micrófono del teclado) */
+const SR_CLS=window.SpeechRecognition||window.webkitSpeechRecognition;
+const IS_ANDROID=/Android/i.test(navigator.userAgent||'');
+const SRX={r:null,on:false,want:false,failed:false,netFails:0,consumed:0,recIdx:0,text:'',lastIn:0,err:'',lastToks:[]};
+const srUsable=()=>!!SR_CLS&&!SRX.failed;
+/* Entre las alternativas del reconocedor, elige la que más se parece a lo que viene en el guion */
+function pickAlt(res){
+  if(!(res.length>1)||!TP.on||ST.tp.mode!=='voz'||!TP.F||!TP.fw.length)return res[0].transcript;
+  const win=new Set(TP.fw.slice(TP.F.i,TP.F.i+14));let best=res[0].transcript,bs=-1;
+  for(let a=0;a<res.length;a++){let s=0;for(const t of speechTokens(res[a].transcript))if(win.has(t))s++;if(s>bs){bs=s;best=res[a].transcript;}}
+  return best;
+}
+/* Texto grabado: comandos hablados («coma», «punto»…) y puntuación automática */
+function srAppend(t){
+  const seg=punctuate(t,{lang:ST.lang,auto:ST.autoPunct!==false,prev:SRX.text});
+  if(!seg)return;
+  if(/^[,;:.?!…)]/.test(seg))SRX.text=SRX.text.replace(/[.]\s*$/,'');
+  SRX.text+=(SRX.text&&!/\n$/.test(SRX.text)&&!/^[,;:.?!…)]/.test(seg)?' ':'')+seg;
+}
+function srFeed(toks,upto){
+  if(upto>SRX.consumed){
+    const fresh=toks.slice(SRX.consumed,upto);SRX.consumed=upto;SRX.lastIn=performance.now();
+    if(TP.on)tpTokens(fresh);
+  }
+}
+function srBegin(){
+  if(SRX.on||!SRX.want||!srUsable())return;
+  let r;try{r=new SR_CLS();}catch(e){SRX.failed=true;tpSyncDictation();return;}
+  r.lang=({es:'es-ES',en:'en-US',pt:'pt-BR'})[ST.lang]||'es-ES';
+  r.interimResults=true;r.continuous=!IS_ANDROID;r.maxAlternatives=3;
+  SRX.consumed=0;SRX.recIdx=0;SRX.err='';SRX.lastToks=[];
+  r.onstart=()=>{SRX.on=true;SRX.netFails=0;};
+  r.onresult=ev=>{
+    let text='',fin=true;
+    for(let i=0;i<ev.results.length;i++){
+      const res=ev.results[i];text+=pickAlt(res)+' ';if(!res.isFinal)fin=false;
+    }
+    for(let i=SRX.recIdx;i<ev.results.length;i++){
+      if(ev.results[i].isFinal){const t=ev.results[i][0].transcript.trim();if(t)srAppend(t);SRX.recIdx=i+1;}else break;
+    }
+    const toks=speechTokens(text);SRX.lastToks=toks;
+    if(toks.length<SRX.consumed)SRX.consumed=0;
+    srFeed(toks,fin?toks.length:Math.max(SRX.consumed,toks.length-1));
+  };
+  r.onerror=e=>{
+    SRX.err=e.error||'';
+    if(['not-allowed','service-not-allowed','audio-capture','language-not-supported'].includes(SRX.err)){
+      SRX.failed=true;
+      toast(SRX.err==='not-allowed'||SRX.err==='service-not-allowed'
+        ?(location.protocol==='https:'||location.hostname==='localhost'
+          ?'El navegador no dio permiso al micrófono. Usaré la línea de dictado con el teclado. Permite el micrófono para esta página en los ajustes del sitio.'
+          :'Abierta como archivo local, esta página no puede usar el micrófono en el celular. Usaré la línea de dictado con el teclado. Para el micrófono directo, mira «Ayuda» → «Micrófono directo».')
+        :'No pude usar el micrófono directamente. Usaré la línea de dictado con el teclado.',7000);
+    }else if(SRX.err==='network'){if(++SRX.netFails>3){SRX.failed=true;toast('El reconocimiento de voz necesita internet. Usaré la línea de dictado.',6000);}}
+  };
+  r.onend=()=>{
+    SRX.on=false;
+    srFeed(SRX.lastToks,SRX.lastToks.length);SRX.consumed=0;SRX.lastToks=[];
+    if(SRX.failed){SRX.want=false;tpSyncDictation();return;}
+    if(SRX.want)setTimeout(()=>{if(SRX.want&&!SRX.on)srBegin();},SRX.err==='network'?800:60);
+  };
+  SRX.r=r;
+  try{r.start();SRX.on=true;}catch(e){SRX.on=false;setTimeout(()=>{if(SRX.want&&!SRX.on)srBegin();},400);}
+}
+function srWant(on){
+  SRX.want=on;
+  if(on){if(!SRX.on)srBegin();}
+  else if(SRX.r){try{SRX.r.abort();}catch(e){}}
+}
+function tpSyncDictation(){
+  if(!TP.on){srWant(false);return;}
+  const want=(ST.tp.mode==='voz'&&TP.playing)||TP.rec;
+  const slot=$('#tpDictSlot');
+  if(srUsable()){
+    slot.hidden=true;DL.onTokens=null;dlSetActive(false);srWant(!!want);
+  }else{
+    srWant(false);slot.hidden=!want;
+    DL.quiet=!TP.rec;
+    if(want){dlMount(slot);DL.onTokens=tpTokens;dlSetActive(true);DL.ta.classList.remove('quiet');DL.ta.placeholder=DL.quiet?'Toca el micrófono del teclado y lee (no se guarda)':'Toca aquí y pulsa el micrófono del teclado';}
+    else{DL.onTokens=null;dlSetActive(false);if(DL.ta)DL.ta.blur();}
+    if(want&&DL.ta)setTimeout(()=>DL.ta.focus(),0);
+  }
+  requestAnimationFrame(layoutTp);
+  renderHeard();
+}
+function toggleRec(){
+  if(TP.rec){finishRec();return;}
+  TP.rec=true;DL.quiet=false;dlReset();SRX.text='';tpSyncDictation();tpUI();
+  toast(srUsable()?'Grabando lo que dices.':'Grabando. Pulsa el micrófono del teclado y habla.',4200);
+}
+async function finishRec(silent){
+  if(!TP.rec)return;
+  TP.rec=false;dlProcess(true);
+  const text=(SRX.text.trim()||punctuate(dlText().trim(),{lang:ST.lang,auto:ST.autoPunct!==false})),title=A.cur?A.cur.title:'';
+  tpSyncDictation();tpUI();
+  if(!text){if(!silent)toast('No se recibió ninguna palabra para guardar.');return;}
+  const r=await createRec(defaultRecName(title),text);
+  dlReset();SRX.text='';
+  toast('Guardado en Textos grabados: «'+r.name+'»',5200);
+}
+
+/* Ajustes y eventos del teleprompter */
+function syncTpSettings(){
+  const t=ST.tp;
+  const seg=(sel,attr,val)=>$$(sel+' button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset[attr]===String(val))));
+  seg('#tpH','h',t.h);seg('#tpAnchor','a',t.anchor);seg('#tpW','w',t.w);seg('#tpAl','al',t.al);
+  $$('#tpScheme button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.s===t.scheme)));
+  const rng=(id,val,lab,txt,min,max)=>{const e=$(id);e.value=val;e.style.setProperty('--p',((val-min)/(max-min)*100)+'%');$(lab).textContent=txt;};
+  rng('#tpOp',t.op,'#tpOpVal',t.op+' %',20,100);rng('#tpFs',t.fs,'#tpFsVal',t.fs+' px',18,90);
+  rng('#tpWpm',t.wpm,'#tpWpmVal',t.wpm+' ppm',40,300);rng('#tpBandPos',t.band,'#tpBandVal',t.band+' %',12,70);
+  $('#tpMirror').checked=!!t.mirror;$('#tpDim').checked=!!t.dim;$('#tpCount3').checked=!!t.count;$('#tpWake').checked=!!t.wake;
+}
+function tpKey(e){
+  if(/INPUT|TEXTAREA|SELECT/.test(e.target.tagName))return;
+  if(e.code==='Space'){e.preventDefault();tpToggle();}
+  else if(e.key==='+'||e.key==='=')tpSpeed(10);
+  else if(e.key==='-')tpSpeed(-10);
+  else if(e.key==='Escape')closeTp();
+}
+function bindTp(){
+  setIc('#tpClose','x',20);setIc('#tpSet','sliders');setIc('#tpSlow','minus',22);setIc('#tpFast','plus',22);
+  $('#btnTp').addEventListener('click',openTp);
+  $('#tpClose').addEventListener('click',closeTp);
+  $('#tpSet').addEventListener('click',()=>{syncTpSettings();openSheet('#shTp');});
+  $('#tpPlay').addEventListener('click',tpToggle);
+  $('#tpSlow').addEventListener('click',()=>tpSpeed(-10));$('#tpFast').addEventListener('click',()=>tpSpeed(10));
+  $('#tpRec').addEventListener('click',toggleRec);
+  $$('#tpMode button').forEach(b=>b.addEventListener('click',()=>tpSetMode(b.dataset.m)));
+  $('#tpText').addEventListener('click',e=>{
+    const w=e.target.closest('.w');if(!w)return;
+    const now=performance.now();
+    if(TP.tap.el===w&&now-TP.tap.t<400){TP.tap={el:null,t:0};tpJump(+w.dataset.k);}
+    else TP.tap={el:w,t:now};
+  });
+  const sc=$('#tpScroll'),hold=()=>{TP.hold=performance.now()+2200;TP.userScrolled=true;};
+  sc.addEventListener('wheel',hold,{passive:true});sc.addEventListener('touchmove',hold,{passive:true});
+  if('ResizeObserver' in window)new ResizeObserver(layoutTp).observe(sc);
+  const set=(k,v)=>{ST.tp[k]=v;saveSettings();applyTpStyle();syncTpSettings();};
+  $$('#tpH button').forEach(b=>b.addEventListener('click',()=>set('h',+b.dataset.h)));
+  $$('#tpAnchor button').forEach(b=>b.addEventListener('click',()=>set('anchor',b.dataset.a)));
+  $$('#tpW button').forEach(b=>b.addEventListener('click',()=>set('w',+b.dataset.w)));
+  $$('#tpAl button').forEach(b=>b.addEventListener('click',()=>set('al',b.dataset.al)));
+  $$('#tpScheme button').forEach(b=>b.addEventListener('click',()=>set('scheme',b.dataset.s)));
+  $('#tpOp').addEventListener('input',e=>set('op',+e.target.value));
+  $('#tpFs').addEventListener('input',e=>set('fs',+e.target.value));
+  $('#tpBandPos').addEventListener('input',e=>set('band',+e.target.value));
+  $('#tpWpm').addEventListener('input',e=>{ST.tp.wpm=+e.target.value;saveSettings();syncTpSettings();tpUI();});
+  $('#tpMirror').addEventListener('change',e=>set('mirror',e.target.checked));
+  $('#tpDim').addEventListener('change',e=>set('dim',e.target.checked));
+  $('#tpCount3').addEventListener('change',e=>set('count',e.target.checked));
+  $('#tpWake').addEventListener('change',e=>{set('wake',e.target.checked);if(TP.on)setWake(e.target.checked,true);});
+}
+
+/* Biblioteca: dictado, textos y respaldo */
+function bindRecs(){
+  setIc('#btnDict','mic');$('#recNew').innerHTML=ic('mic',18)+'<span>Dictar</span>';
+  $('#btnDict').addEventListener('click',openDictSheet);$('#recNew').addEventListener('click',openDictSheet);
+  $('#recBackup').addEventListener('click',openBackup);$('#openBackup').addEventListener('click',openBackup);
+  $$('#kindChips button').forEach(x=>x.addEventListener('click',()=>{A.bookKind=x.dataset.k;renderLib();}));
+  $$('#libTabs button').forEach(b=>b.addEventListener('click',()=>{A.libTab=b.dataset.t;renderLib();}));
+  $('#dictSaveBtn').addEventListener('click',saveDictation);$('#dictDiscard').addEventListener('click',discardDictation);
+  $('#recSave').addEventListener('click',()=>saveRecEdits(false));
+  $('#recText').addEventListener('input',syncRecUI);
+  $('#recCopy').addEventListener('click',()=>copyText($('#recText').value,'Texto copiado'));
+  $('#recWa').addEventListener('click',()=>{saveRecEdits(true);});
+  $('#recSaveFile').addEventListener('click',recSaveFile);$('#recShare').addEventListener('click',recShare);$('#recPrint').addEventListener('click',printRec);
+  $('#bkShare').addEventListener('click',shareBackup);$('#bkApp').addEventListener('click',exportApp);$('#btnSaveApp').addEventListener('click',()=>saveApp(true,false));$('#saveHint').addEventListener('click',()=>saveApp(true,false));bindBibleMenu();bindSearch();$('#btnHelp').addEventListener('click',()=>openSheet('#shHelp'));
+  $('#autoPunct').checked=ST.autoPunct!==false;$('#autoPunct').addEventListener('change',e=>{ST.autoPunct=e.target.checked;saveSettings();});
+  $('#autoSave').checked=!!ST.autoSave;$('#autoSave').addEventListener('change',e=>{ST.autoSave=e.target.checked;saveSettings();});
+  setIc('#btnSaveApp','save');$('#btnSaveApp').insertAdjacentHTML('beforeend','<span class="sdot"></span>');setIc('#btnHelp','help');
+  setInterval(()=>autoSaveTick(false),1800000);setInterval(updateSaveBtn,4000);
+  addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&!e.shiftKey&&!e.altKey&&e.key.toLowerCase()==='g'){e.preventDefault();saveApp(true,false);}});
+  $('#saveCopy').addEventListener('click',()=>copyText($('#saveText').value,'Texto copiado'));
+  $('#saveRetry').addEventListener('click',()=>{if(!lastSave)return;closeSheets();saveFile(lastSave.filename,lastSave.data,lastSave.okMsg,lastSave.fallbackText);});
+  $('#recBook').addEventListener('click',recToBook);$('#recDel').addEventListener('click',deleteRec);
+  $('#bkDl').addEventListener('click',async()=>{const s=await buildBackup();saveFile('LeamosTxTs - respaldo '+new Date().toISOString().slice(0,10)+'.json',s,'Respaldo guardado. Súbelo a tu Drive o envíalo por WhatsApp.',s);});
+  $('#bkCopy').addEventListener('click',async()=>copyText(await buildBackup(),'Respaldo copiado'));
+  $('#bkFile').addEventListener('change',async e=>{const f=e.target.files[0];e.target.value='';if(!f)return;try{toast(await importBackup(await f.text()),5000);closeSheets();}catch(err){toast(err.message,5000);}});
+  $('#bkImport').addEventListener('click',async()=>{const v=$('#bkPaste').value.trim();if(!v){toast('Pega primero el respaldo copiado.');return;}try{toast(await importBackup(v),5000);$('#bkPaste').value='';closeSheets();}catch(err){toast(err.message,5000);}});
+  $('#editCopy').addEventListener('change',e=>{ST.editCopy=e.target.checked;saveSettings();});
+  $('#editCopy').checked=!!ST.editCopy;
+}
+
+/* Clic derecho (o mantener pulsado) sobre un texto seleccionado: «BuscarB» abre BibleGateway */
+function bindBibleMenu(){
+  const menu=el('div','ctxmenu');menu.id='ctxMenu';menu.hidden=true;
+  const btn=el('button',null,'BuscarB');btn.type='button';menu.append(btn);document.body.append(menu);
+  let url='',shownAt=0;
+  const hide=()=>{menu.hidden=true;};
+  const selOf=t=>{
+    if(t&&t.id==='editArea')return t.value.slice(t.selectionStart,t.selectionEnd);
+    const s=getSelection();return s&&!s.isCollapsed?s.toString():'';
+  };
+  document.addEventListener('contextmenu',e=>{
+    const inEdit=e.target.id==='editArea',inText=e.target.closest&&e.target.closest('#text');
+    if(!inEdit&&!inText)return;
+    const sel=selOf(inEdit?e.target:null).trim();
+    if(!sel)return;
+    e.preventDefault();
+    url=bibleSearchUrl(sel,ST.bible);
+    menu.hidden=false;shownAt=Date.now();
+    const w=menu.offsetWidth,h=menu.offsetHeight;
+    menu.style.left=Math.max(8,Math.min(innerWidth-w-8,e.clientX))+'px';
+    menu.style.top=Math.max(8,Math.min(innerHeight-h-8,e.clientY))+'px';
+    btn.title='Buscar «'+sel.slice(0,40)+'» en BibleGateway';
+  });
+  btn.addEventListener('click',()=>{const a=document.createElement('a');a.href=url;a.target='_blank';a.rel='noopener noreferrer';a.style.display='none';document.body.append(a);a.click();a.remove();hide();});
+  document.addEventListener('pointerdown',e=>{if(!menu.hidden&&!menu.contains(e.target))hide();},true);
+  addEventListener('scroll',()=>{if(Date.now()-shownAt>600)hide();},true);
+  document.addEventListener('keydown',e=>{if(e.key==='Escape')hide();});
+}
+
+/* Buscar dentro del documento */
+function foldStr(s){let o='';for(let i=0;i<s.length;i++){const c=s[i].normalize('NFD').charAt(0).toLowerCase();o+=c||s[i];}return o;}
+function searchDoc(q){
+  const out=[];if(!A.R)return out;
+  const fq=foldStr(q.trim());if(!fq)return out;
+  const qrefs=findRefs(q).map(f=>f.canon+' '+f.rest);
+  const words=fq.split(/\s+/).filter(w=>w.length>1);
+  A.R.sents.forEach((s,i)=>{
+    const fs=foldStr(s.t);let at=fs.indexOf(fq),len=fq.length;
+    if(at<0&&qrefs.length){const rs=findRefs(s.t).map(f=>f.canon+' '+f.rest);if(qrefs.some(k=>rs.includes(k))){const m=findRefs(s.t).find(f=>qrefs.includes(f.canon+' '+f.rest));at=m?m.start:0;len=m?m.end-m.start:1;}}
+    if(at<0&&words.length>1&&words.every(w=>fs.includes(w))){at=fs.indexOf(words[0]);len=words[0].length;}
+    if(at>=0)out.push({i,p:s.p,at,len,t:s.t});
+  });
+  return out;
+}
+function snippet(r){
+  const pre=Math.max(0,r.at-55),post=Math.min(r.t.length,r.at+r.len+70);
+  const f=document.createDocumentFragment();
+  f.append((pre>0?'… ':'')+r.t.slice(pre,r.at));
+  f.append(el('mark',null,r.t.slice(r.at,r.at+r.len)));
+  f.append(r.t.slice(r.at+r.len,post)+(post<r.t.length?' …':''));
+  return f;
+}
+function runSearch(){
+  const q=$('#srchInput').value,box=$('#srchList');box.replaceChildren();
+  if(q.trim().length<2){$('#srchCount').textContent='Escribe una palabra, una frase o un verso (por ejemplo Juan 3:16).';return;}
+  const res=searchDoc(q);
+  $('#srchCount').textContent=res.length?(res.length>300?'Más de 300 resultados; muestro los primeros 300.':res.length+(res.length===1?' resultado':' resultados')):'No encontré «'+q.trim()+'» en este documento.';
+  for(const r of res.slice(0,300)){
+    const b=el('button','srch-row');b.type='button';
+    b.append(el('span','srch-pg','Pág. '+(r.p+1)),el('span','srch-tx'));
+    b.lastChild.append(snippet(r));
+    b.addEventListener('click',()=>goToSentence(r.i));
+    box.append(b);
+  }
+}
+function openSearch(){
+  if(A.editing)commitEdit();
+  openSheet('#shSearch');const inp=$('#srchInput');setTimeout(()=>{inp.focus();inp.select();},60);runSearch();
+}
+function bindSearch(){
+  setIc('#btnSearch','search');
+  $('#btnSearch').addEventListener('click',openSearch);
+  let t=0;$('#srchInput').addEventListener('input',()=>{clearTimeout(t);t=setTimeout(runSearch,160);});
+  $('#srchInput').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();runSearch();const f=$('#srchList .srch-row');if(f&&e.shiftKey===false&&$('#srchList').children.length===1)f.click();}});
+  addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&!e.shiftKey&&!e.altKey&&e.key.toLowerCase()==='f'&&A.view==='read'){e.preventDefault();openSearch();}});
+}
+
+/* Motor de voz */
+const TTS='speechSynthesis' in window;
+function voiceScore(v){
+  let s=0;const l=v.lang.replace('_','-').toLowerCase();
+  if(ST.lang==='es'){s+=(l==='es-419'||l==='es-mx'||l==='es-us')?5:(l==='es-es'?3:2);}
+  else if(ST.lang==='pt'){s+=l==='pt-br'?5:(l==='pt-pt'?3:1);}
+  else{s+=l==='en-us'?4:(l==='en-gb'?3:1);}
+  if(/natural|online|neural/i.test(v.name))s+=4;
+  if(/google/i.test(v.name))s+=2;
+  if(v.default)s+=1;
+  return s;
+}
+const LNAME=()=>({es:'español',en:'inglés',pt:'portugués'}[ST.lang]);
+const LFALL={es:'es-ES',en:'en-US',pt:'pt-BR'};
+function voicesFor(){return A.voices.filter(v=>v.lang.toLowerCase().replace('_','-').startsWith(ST.lang)).sort((a,b)=>voiceScore(b)-voiceScore(a));}
+function currentVoice(){
+  const list=voicesFor();if(!list.length)return null;
+  const saved=ST.voice[ST.lang];
+  return list.find(v=>v.voiceURI===saved)||list[0];
+}
+function refreshVoices(){
+  if(!TTS)return;
+  A.voices=speechSynthesis.getVoices();
+  const sel=$('#voiceSel');sel.replaceChildren();
+  const auto=el('option',null,'Automática (la mejor disponible)');auto.value='';sel.append(auto);
+  const list=voicesFor();
+  for(const v of list){const o=el('option',null,v.name+' ('+v.lang+')');o.value=v.voiceURI;sel.append(o);}
+  sel.value=list.some(v=>v.voiceURI===ST.voice[ST.lang])?ST.voice[ST.lang]:'';
+  $('#voiceNote').textContent=list.length?list.length+' voces de '+LNAME()+' encontradas en este dispositivo.':'Este dispositivo no muestra voces de '+LNAME()+'; se usará la voz predeterminada del sistema.';
+}
+function speak(i){
+  if(!A.cur||!A.R.sents.length){toast('Este libro no tiene texto para leer.');return;}
+  if(!TTS){toast('Tu navegador no incluye lectura en voz alta.');return;}
+  if(i<0)i=0;
+  if(i>=A.R.sents.length){finish();return;}
+  const my=++A.token;A.playing=true;A.started=true;A.finished=false;A.lastAct=Date.now();
+  setPos(i,{scroll:true});uiPlaying();keepAlive(true);
+  try{speechSynthesis.cancel();}catch(e){}
+  setTimeout(()=>{
+    if(my!==A.token||!A.playing)return;
+    const text=speechText(A.R.sents[i].t,ST.bibleOn,ST.lang);
+    if(!/[\p{L}\p{N}]/u.test(text)){speak(i+1);return;}
+    const u=new SpeechSynthesisUtterance(text);
+    const v=currentVoice();
+    if(v){u.voice=v;u.lang=v.lang;}else u.lang=LFALL[ST.lang]||'es-ES';
+    u.volume=ST.vol;u.rate=ST.rate;
+    u.onstart=()=>{A.lastAct=Date.now();};
+    u.onend=()=>{if(my!==A.token||!A.playing)return;A.lastAct=Date.now();speak(i+1);};
+    u.onerror=e=>{
+      if(my!==A.token)return;
+      if(e.error==='canceled'||e.error==='interrupted')return;
+      if(e.error==='not-allowed'){pause();toast('El navegador bloqueó el audio. Pulsa reproducir otra vez.');return;}
+      A.lastAct=Date.now();setTimeout(()=>{if(my===A.token&&A.playing)speak(i+1);},200);
+    };
+    A.utt=u;speechSynthesis.speak(u);
+  },40);
+}
+function pause(){
+  A.token++;A.playing=false;
+  try{if(TTS)speechSynthesis.cancel();}catch(e){}
+  keepAlive(false);uiPlaying();saveNow();
+}
+function finish(){
+  pause();A.finished=true;
+  if(A.R&&A.R.sents.length)setPos(A.R.sents.length-1);
+  toast('Fin de la lectura');
+}
+function stopAll(){
+  pause();A.started=false;
+  if(A.R&&A.R.sents.length){
+    const st=A.R.pageStarts[A.page];
+    setPos(Math.min(st,A.R.sents.length-1),{keepPage:true,scroll:true});
+  }
+  renderMini();
+}
+function togglePlay(){
+  if(!A.cur)return;
+  if(A.editing){commitEdit().then(()=>{if(!A.playing){if(A.finished)A.pos=0;speak(A.pos);}});return;}
+  if(A.playing){pause();return;}
+  if(A.finished)A.pos=0;
+  speak(A.pos);
+}
+function stepSent(d){
+  if(!A.R||!A.R.sents.length)return;
+  const i=Math.max(0,Math.min(A.R.sents.length-1,A.pos+d));
+  if(A.playing)speak(i);else setPos(i,{scroll:true});
+}
+function pageHasText(p){return (A.R.paraMap[p]||[]).length>0;}
+function goPage(p){
+  if(A.editing){commitEdit().then(()=>goPage(p));return;}
+  p=Math.max(0,Math.min(A.cur.pageCount-1,p));
+  let q=p;while(q<A.cur.pageCount-1&&!pageHasText(q))q++;
+  const idx=Math.min(A.R.pageStarts[q],A.R.sents.length-1);
+  if(!A.R.sents.length)return;
+  if(pageHasText(p)||q===p){scrollTo(0,0);renderPage(p);}else{scrollTo(0,0);renderPage(p);}
+  setPos(idx,{keepPage:true});
+  if(A.playing)speak(idx);
+}
+function stepPage(d){
+  let p=A.page+d;
+  while(p>=0&&p<A.cur.pageCount&&!pageHasText(p))p+=d;
+  if(p<0||p>=A.cur.pageCount){if(d>0&&A.playing)finish();else toast(d>0?'Ya estás en la última página.':'Ya estás en la primera página.');return;}
+  goPage(p);
+}
+function uiPlaying(){
+  const pl=A.playing;
+  for(const id of ['#bPlay','#miniPlay','#foldPlay']){const b=$(id);if(b){b.innerHTML=ic(pl?'pause':'play',id==='#bPlay'?28:22);b.setAttribute('aria-label',pl?'Pausar':'Reproducir');}}
+  setWake(pl);
+  if('mediaSession' in navigator)try{navigator.mediaSession.playbackState=pl?'playing':'paused';}catch(e){}
+  renderMini();
+}
+
+/* Segundo plano: audio silencioso, Media Session, pantalla encendida */
+function silentWav(){
+  const sr=8000,n=sr,buf=new ArrayBuffer(44+n),v=new DataView(buf);
+  const w=(o,s)=>{for(let i=0;i<s.length;i++)v.setUint8(o+i,s.charCodeAt(i));};
+  w(0,'RIFF');v.setUint32(4,36+n,true);w(8,'WAVE');w(12,'fmt ');v.setUint32(16,16,true);v.setUint16(20,1,true);v.setUint16(22,1,true);
+  v.setUint32(24,sr,true);v.setUint32(28,sr,true);v.setUint16(32,1,true);v.setUint16(34,8,true);w(36,'data');v.setUint32(40,n,true);
+  new Uint8Array(buf,44).fill(128);
+  const u=new Uint8Array(buf);let bin='';
+  for(let i=0;i<u.length;i+=0x8000)bin+=String.fromCharCode.apply(null,u.subarray(i,i+0x8000));
+  return 'data:audio/wav;base64,'+btoa(bin);
+}
+function keepAlive(on){
+  try{
+    if(on){if(!A.keep){A.keep=new Audio(silentWav());A.keep.loop=true;}const p=A.keep.play();if(p&&p.catch)p.catch(()=>{});}
+    else if(A.keep)A.keep.pause();
+  }catch(e){}
+}
+function mediaMeta(){
+  if(!('mediaSession' in navigator)||!A.cur||typeof MediaMetadata==='undefined')return;
+  try{navigator.mediaSession.metadata=new MediaMetadata({title:A.cur.title,artist:'LeamosTxTs',album:'Página '+(A.page+1)+' de '+A.cur.pageCount});}catch(e){}
+}
+function setupMedia(){
+  if(!('mediaSession' in navigator))return;
+  const ms=navigator.mediaSession,set=(a,f)=>{try{ms.setActionHandler(a,f);}catch(e){}};
+  set('play',()=>{if(!A.playing)togglePlay();});set('pause',()=>{if(A.playing)togglePlay();});
+  set('previoustrack',()=>{if(A.cur)stepPage(-1);});set('nexttrack',()=>{if(A.cur)stepPage(1);});set('stop',stopAll);
+}
+async function setWake(on,force){
+  try{
+    if(on&&(ST.wake||force)&&'wakeLock' in navigator&&!document.hidden&&!A.wl){A.wl=await navigator.wakeLock.request('screen');A.wl.addEventListener('release',()=>{A.wl=null;});}
+    else if(!on&&A.wl){await A.wl.release();A.wl=null;}
+  }catch(e){}
+}
+document.addEventListener('visibilitychange',()=>{
+  if(document.hidden){if(A.editing)commitEdit();saveNow();return;}
+  if(A.playing&&TTS&&!speechSynthesis.speaking&&!speechSynthesis.pending)speak(A.pos);
+  setWake(A.playing||(TP.on&&ST.tp.wake),TP.on&&ST.tp.wake);
+});
+addEventListener('pagehide',saveNow);
+setInterval(()=>{
+  if(A.playing&&TTS&&!speechSynthesis.speaking&&!speechSynthesis.pending&&Date.now()-A.lastAct>3500)speak(A.pos);
+},1500);
+
+/* Importación */
+function loadScript(src){return new Promise((res,rej)=>{const s=document.createElement('script');s.src=src;s.onload=res;s.onerror=()=>rej(new Error('No se pudo cargar el lector de PDF. Revisa tu conexión.'));document.head.append(s);});}
+async function ensurePdfJs(){
+  if(window.pdfjsLib)return window.pdfjsLib;
+  const base='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/';
+  await loadScript(base+'pdf.min.js');
+  window.pdfjsLib.GlobalWorkerOptions.workerSrc=base+'pdf.worker.min.js';
+  return window.pdfjsLib;
+}
+async function pdfPageParas(page){
+  const tc=await page.getTextContent(),lines=[];let cur=null;
+  for(const it of tc.items){
+    if(it.str===undefined)continue;
+    const y=it.transform[5],h=Math.abs(it.height)||Math.abs(it.transform[3])||10;
+    if(cur&&Math.abs(cur.y-y)<h*0.5){cur.text+=it.str;}
+    else if(it.str.trim()){cur={y,text:it.str};lines.push(cur);}
+  }
+  const gaps=[];for(let i=1;i<lines.length;i++){const g=lines[i-1].y-lines[i].y;if(g>0)gaps.push(g);}
+  gaps.sort((a,b)=>a-b);const med=gaps.length?gaps[Math.floor(gaps.length/2)]:0;
+  const paras=[];let buf='';
+  lines.forEach((ln,i)=>{
+    const t=ln.text.replace(/\s+/g,' ').trim();if(!t)return;
+    if(i>0&&med>0){const g=lines[i-1].y-ln.y;if(g>med*1.45||g<0){if(buf)paras.push(buf);buf=t;return;}}
+    if(buf){buf=(/-$/.test(buf)&&/^\p{Ll}/u.test(t))?buf.slice(0,-1)+t:buf+' '+t;}else buf=t;
+  });
+  if(buf)paras.push(buf);
+  return paras.flatMap(softParas);
+}
+async function pdfCover(page){
+  const v0=page.getViewport({scale:1}),vp=page.getViewport({scale:220/v0.width});
+  const c=document.createElement('canvas');c.width=Math.floor(vp.width);c.height=Math.floor(vp.height);
+  await page.render({canvasContext:c.getContext('2d'),viewport:vp}).promise;
+  return c.toDataURL('image/jpeg',0.7);
+}
+async function importPdf(file,base){
+  busy('Abriendo PDF…',0);
+  const lib=await ensurePdfJs();
+  const pdf=await lib.getDocument({data:new Uint8Array(await file.arrayBuffer())}).promise;
+  const pages=[];let cover=null,chars=0;
+  for(let n=1;n<=pdf.numPages;n++){
+    busy('Leyendo PDF… página '+n+' de '+pdf.numPages,n/pdf.numPages);
+    let txt='';
+    try{
+      const pg=await pdf.getPage(n);
+      if(n===1){try{cover=await pdfCover(pg);}catch(e){}}
+      txt=(await pdfPageParas(pg)).join('\n\n');pg.cleanup();
+    }catch(e){}
+    chars+=txt.length;pages.push(txt);
+  }
+  if(chars<20)throw new Error('Este PDF no tiene texto seleccionable (parece una imagen escaneada) y necesitaría OCR.');
+  return createBook({title:base,kind:'pdf',pages,cover});
+}
+async function importDocx(file,base){
+  busy('Leyendo documento…',0.4);
+  let text;
+  try{text=await docxToText(await file.arrayBuffer());}catch(e){throw new Error('No pude abrir este .docx. Comprueba que no esté dañado o protegido con contraseña.');}
+  const paras=textToParas(text);
+  if(!paras.length)throw new Error('El documento no tiene texto.');
+  return createBook({title:base,kind:'docx',pages:paginate(paras)});
+}
+async function importTxt(file,base){
+  busy('Leyendo texto…',0.4);
+  const buf=await file.arrayBuffer();let text;
+  try{text=new TextDecoder('utf-8',{fatal:true}).decode(buf);}catch(e){text=new TextDecoder('windows-1252').decode(buf);}
+  const paras=textToParas(text);
+  if(!paras.length)throw new Error('El archivo está vacío.');
+  return createBook({title:base,kind:'txt',pages:paginate(paras)});
+}
+async function importFiles(files){
+  closeSheets();const made=[];
+  for(const f of [...files]){
+    const ext=(f.name.split('.').pop()||'').toLowerCase(),base=f.name.replace(/\.[^.]+$/,'');
+    try{
+      let b;
+      if(ext==='pdf'||f.type==='application/pdf')b=await importPdf(f,base);
+      else if(ext==='docx')b=await importDocx(f,base);
+      else if(ext==='json'){toast(await importBackup(await f.text()),5000);continue;}
+      else if(ext==='doc')throw new Error('Los .doc antiguos no se pueden leer. Guárdalo como .docx e inténtalo de nuevo.');
+      else if(['txt','md','text','markdown','csv'].includes(ext)||(f.type||'').startsWith('text/'))b=await importTxt(f,base);
+      else throw new Error('No reconozco el formato de «'+f.name+'». Usa PDF, DOCX o TXT.');
+      made.push(b);
+    }catch(e){toast(e.message||'No pude importar «'+f.name+'».',5200);}
+  }
+  unbusy();renderLib();
+  if(made.length===1)openBook(made[0].id);
+  else if(made.length>1)toast(made.length+' libros añadidos');
+}
+async function saveText(read){
+  const raw=$('#txBody').value;const paras=textToParas(raw);
+  if(!paras.length){toast('Escribe o pega algún texto primero.');return;}
+  const d=new Date();
+  const title=$('#txTitle').value.trim()||('Apuntes '+d.toLocaleDateString('es'));
+  const b=await createBook({title,kind:'texto',pages:paginate(paras),source:A.pendingSource||''});
+  A.pendingSource=null;$('#txBody').value='';$('#txTitle').value='';closeSheets();renderLib();
+  await openBook(b.id,{play:read});
+}
+function addTab(t){
+  $$('#addTabs button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.tab===t)));
+  $$('#shAdd [data-panel]').forEach(p=>{p.hidden=p.dataset.panel!==t;});
+}
+const SAMPLE=['Bienvenido a LeamosTxTs. Esta es una guía de ejemplo y puedes eliminarla cuando quieras.','Pulsa el botón de reproducir y la voz de tu dispositivo leerá el texto de principio a fin. Toca dos veces cualquier frase para empezar a leer desde ahí. Con la barra de avance puedes moverte a cualquier punto, y con el campo de página saltar a la que quieras.','Arrastra un PDF, un archivo de Word o un TXT a esta página, o pega texto copiado, y quedará guardado en tu biblioteca con tu avance de lectura. Desde el menú de cada libro puedes editarlo o eliminarlo.','Los pasajes bíblicos se reconocen solos y se abren en BibleGateway. Por ejemplo: Juan 3:16, Salmos 23:1-3, 1 Corintios 13:4-7, Romanos 8:28 y Filipenses 4:13. Puedes cambiar la versión en Ajustes o en el panel de pasajes.','Si sales de la lectura, el audio sigue desde la biblioteca. Algunos teléfonos pausan la voz al apagar la pantalla; si te pasa, vuelve a pulsar reproducir y seguirá donde quedó.'];
+
+/* Eventos */
+function bind(){
+  setIc('#btnBack','back');setIc('#btnPassages','book');setIc('#btnSettings','sliders');
+  $('#btnAdd').innerHTML=ic('plus',18)+'<span>Añadir</span>';
+  $('#emptyAdd').innerHTML=ic('plus',18)+'<span>Añadir un libro</span>';
+  setIc('#bStop','stop',20);setIc('#bPrevPage','prevPage');setIc('#bPrev','prev');setIc('#bNext','next');setIc('#bNextPage','nextPage');
+  setIc('#volIc','vol',20);setIc('#miniClose','x',20);setIc('#dropIc','upload',30);
+  $$('[data-close]').forEach(b=>{if(b.classList.contains('icon-btn'))b.innerHTML=ic('x',20);b.addEventListener('click',closeSheets);});
+  $$('.veil').forEach(v=>v.addEventListener('click',e=>{if(e.target===v)closeSheets();}));
+  uiPlaying();
+
+  $('#btnBack').addEventListener('click',async()=>{if(A.editing)await commitEdit();setHlMode(false);showView('lib');});
+  bindTools();bindTp();bindRecs();
+  $('#brand').addEventListener('click',()=>{});
+  const openAdd=()=>{addTab('file');openSheet('#shAdd');};
+  $('#btnAdd').addEventListener('click',openAdd);$('#emptyAdd').addEventListener('click',openAdd);
+  $('#btnSettings').addEventListener('click',()=>{syncSettings();openSheet('#shSettings');});
+  $('#btnPassages').addEventListener('click',openPassages);
+  $('#q').addEventListener('input',renderLib);
+  document.addEventListener('click',e=>{if(!e.target.closest('.menu'))closeMenus();});
+
+  $('#bPlay').addEventListener('click',togglePlay);$('#miniPlay').addEventListener('click',togglePlay);
+  $('#bStop').addEventListener('click',stopAll);
+  $('#bPrev').addEventListener('click',()=>stepSent(-1));$('#bNext').addEventListener('click',()=>stepSent(1));
+  $('#bPrevPage').addEventListener('click',()=>stepPage(-1));$('#bNextPage').addEventListener('click',()=>stepPage(1));
+  $('#miniOpen').addEventListener('click',()=>{if(A.cur)openBook(A.cur.id);});
+  $('#miniClose').addEventListener('click',()=>{stopAll();A.started=false;renderMini();});
+
+  const seek=$('#seek');
+  seek.addEventListener('input',()=>updateSeek(+seek.value));
+  seek.addEventListener('change',async()=>{if(A.editing)await commitEdit();const i=Math.min(+seek.value,A.R.sents.length-1);if(A.playing)speak(i);else setPos(i,{scroll:true});});
+  $('#pgInput').addEventListener('change',e=>{const n=parseInt(e.target.value,10);if(isNaN(n)){e.target.value=A.page+1;return;}goPage(n-1);});
+
+  const RATES=[0.8,0.9,1,1.1,1.25,1.5];
+  const syncMix=()=>{$('#vol').value=Math.round(ST.vol*100);$('#vol').style.setProperty('--p',Math.round(ST.vol*100)+'%');$('#rateChip').textContent=(+ST.rate.toFixed(2))+'×';};
+  let rT=null;const restart=()=>{clearTimeout(rT);rT=setTimeout(()=>{if(A.playing)speak(A.pos);},300);};
+  $('#vol').addEventListener('input',e=>{ST.vol=e.target.value/100;saveSettings();syncMix();restart();});
+  $('#rateChip').addEventListener('click',()=>{let i=RATES.findIndex(r=>r>ST.rate+0.001);if(i<0)i=0;ST.rate=RATES[i];saveSettings();syncMix();restart();if(A.R)updateSeek();});
+  A.syncMix=syncMix;syncMix();
+
+  $('#text').addEventListener('click',e=>{
+    if(e.target.closest('a.ref')||A.hlOn||A.editing)return;
+    const sp=e.target.closest('.sent');if(!sp)return;
+    const now=performance.now();
+    if(A.tap.el===sp&&now-A.tap.t<400){A.tap={el:null,t:0};speak(+sp.dataset.i);}
+    else{A.tap={el:sp,t:now};sp.classList.add('tap');setTimeout(()=>sp.classList.remove('tap'),450);}
+  });
+
+  /* Ajustes */
+  const sel=$('#bibleVer');for(const [c,n] of BIBLES){const o=el('option',null,c+' · '+n);o.value=c;sel.append(o);}
+  sel.addEventListener('change',()=>{ST.bible=sel.value;saveSettings();if(A.view==='read')renderPage(A.page);});
+  $('#bibleOn').addEventListener('change',e=>{ST.bibleOn=e.target.checked;saveSettings();if(A.view==='read')renderPage(A.page);restart();});
+  $('#wakeOn').addEventListener('change',e=>{ST.wake=e.target.checked;saveSettings();if(!ST.wake)setWake(false);else setWake(A.playing);});
+  $$('#langSeg button').forEach(b=>b.addEventListener('click',()=>{ST.langMode=b.dataset.lang;ST.lang=ST.langMode==='auto'?(A.cur&&detectLang(A.pages.slice(0,3).join(' '))||'es'):ST.langMode;saveSettings();syncSettings();refreshVoices();restart();if(A.view==='read')$('#text').lang=ST.lang;}));
+  $('#voiceSel').addEventListener('change',e=>{ST.voice[ST.lang]=e.target.value;saveSettings();restart();});
+  $('#voiceTest').addEventListener('click',()=>{
+    if(!TTS)return;const was=A.playing;if(was)pause();
+    const u=new SpeechSynthesisUtterance(({es:'Hola, esta es mi voz. Así leeré tus textos.',en:'Hello, this is my voice. This is how I will read your texts.',pt:'Olá, esta é a minha voz. Assim vou ler os seus textos.'}[ST.lang]));
+    const v=currentVoice();if(v){u.voice=v;u.lang=v.lang;}else u.lang=LFALL[ST.lang]||'es-ES';
+    u.volume=ST.vol;u.rate=ST.rate;speechSynthesis.cancel();speechSynthesis.speak(u);
+  });
+  $('#setVol').addEventListener('input',e=>{ST.vol=e.target.value/100;saveSettings();syncSettings();syncMix();restart();});
+  $('#setRate').addEventListener('input',e=>{ST.rate=e.target.value/100;saveSettings();syncSettings();syncMix();restart();if(A.R)updateSeek();});
+  const fs=d=>{ST.fs=Math.max(15,Math.min(32,ST.fs+d));saveSettings();syncSettings();document.documentElement.style.setProperty('--fs',ST.fs+'px');};
+  $('#fsDown').addEventListener('click',()=>fs(-1));$('#fsUp').addEventListener('click',()=>fs(1));
+
+  /* Añadir */
+  $$('#addTabs button').forEach(b=>b.addEventListener('click',()=>addTab(b.dataset.tab)));
+  $('#fileIn').addEventListener('change',e=>{const f=[...e.target.files];e.target.value='';if(f.length)importFiles(f);});
+  $('#txBody').addEventListener('input',e=>{$('#txHint').hidden=!/^\s*https?:\/\/\S+\s*$/.test(e.target.value);});
+  $('#txSave').addEventListener('click',()=>saveText(false));$('#txSaveRead').addEventListener('click',()=>saveText(true));
+  const lk=$('#lkUrl'),validUrl=()=>{try{const u=new URL(lk.value.trim());return /^https?:$/.test(u.protocol)?u:null;}catch(e){return null;}};
+  lk.addEventListener('input',()=>{const u=validUrl();$('#lkOpen').href=u?u.href:'#';});
+  $('#lkOpen').addEventListener('click',e=>{if(!validUrl()){e.preventDefault();toast('Escribe una dirección que empiece con https://');}});
+  $('#lkPaste').addEventListener('click',()=>{
+    const u=validUrl();if(!u){toast('Escribe una dirección que empiece con https://');return;}
+    A.pendingSource=u.href;$('#txTitle').value=u.hostname.replace(/^www\./,'');addTab('text');$('#txBody').focus();
+  });
+  $('#edSave').addEventListener('click',saveEdit);
+  $('#passScope').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;A.passScope=b.dataset.scope;renderPassages();});
+
+  /* Arrastrar y soltar */
+  const veil=$('#dropVeil'),hasFiles=e=>e.dataTransfer&&[...(e.dataTransfer.types||[])].includes('Files');
+  addEventListener('dragover',e=>{if(hasFiles(e)){e.preventDefault();veil.hidden=false;}});
+  addEventListener('dragleave',e=>{if(!e.relatedTarget)veil.hidden=true;});
+  addEventListener('drop',e=>{if(hasFiles(e)){e.preventDefault();veil.hidden=true;importFiles(e.dataTransfer.files);}});
+
+  addEventListener('keydown',e=>{
+    const sheetOpen=!$$('.veil').every(v=>v.hidden);
+    if(e.key==='Escape')closeSheets();
+    if(TP.on){if(!sheetOpen)tpKey(e);return;}
+    if(A.view!=='read'||sheetOpen)return;
+    if(/INPUT|TEXTAREA|SELECT|BUTTON|A/.test(e.target.tagName))return;
+    if(e.code==='Space'){e.preventDefault();togglePlay();}
+    else if(e.key==='ArrowRight')stepSent(1);else if(e.key==='ArrowLeft')stepSent(-1);
+  });
+  if('ResizeObserver' in window){const ro=new ResizeObserver(updateDockH);ro.observe($('#dock'));ro.observe($('#mini'));}
+}
+function syncSettings(){
+  $$('#langSeg button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.lang===ST.langMode)));
+  $('#setVol').value=Math.round(ST.vol*100);$('#setVol').style.setProperty('--p',Math.round(ST.vol*100)+'%');$('#setVolVal').textContent=Math.round(ST.vol*100)+' %';
+  $('#setRate').value=Math.round(ST.rate*100);$('#setRate').style.setProperty('--p',((ST.rate*100-60)/120*100)+'%');$('#setRateVal').textContent=ST.rate.toFixed(2).replace(/\.?0+$/,'')+'×';
+  $('#fsVal').textContent=ST.fs+' px';$('#bibleVer').value=ST.bible;$('#bibleOn').checked=ST.bibleOn;$('#wakeOn').checked=ST.wake;
+}
+
+/* Inicio */
+(async function init(){
+  bind();setupMedia();syncSettings();
+  document.documentElement.style.setProperty('--fs',ST.fs+'px');
+  if(TTS){refreshVoices();speechSynthesis.addEventListener('voiceschanged',refreshVoices);}
+  else $('#voiceNote').textContent='Este navegador no incluye lectura en voz alta.';
+  await store.init();
+  A.books=await store.all();A.recs=await store.all('recs');
+  const emb=await importEmbedded();loadFsHandle();A.dirty=false;
+  if(!store.ok){
+    A.memMode=true;updateSaveBtn();
+  }else{try{if(navigator.storage&&navigator.storage.persist)navigator.storage.persist();}catch(e){}}
+  let seeded=false;try{seeded=localStorage.getItem('leo.seeded')==='1';}catch(e){}
+  if(!A.books.length&&!seeded&&!emb){
+    await createBook({title:'Guía de bienvenida (ejemplo)',kind:'texto',pages:paginate(textToParas(SAMPLE.join('\n\n')))});
+    try{localStorage.setItem('leo.seeded','1');}catch(e){}
+  }
+  renderLib();
+})();
+})();
+</script></body></html>
